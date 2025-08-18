@@ -22,6 +22,7 @@ namespace BlogApp.Services
             baseURL = configuration["YandexApi:baseURL"] ?? "";
             folderID = configuration["YandexApi:folderId"] ?? "";
             apiKey = configuration["YandexApi:apiKey"] ?? "";
+
             this.serviceProvider = serviceProvider;
         }
 
@@ -78,10 +79,10 @@ namespace BlogApp.Services
 
                 ParallelOptions parallelOptions = new ParallelOptions()
                 {
-
+                    CancellationToken = cts.Token
                 };
 
-                Parallel.ForEach(languages.Where(l => l.LangName != "ka" && l.LangName != "ko"), parallelOptions, async (Language lan) =>
+                Parallel.ForEach(languages.Where(l => l.LangName != "ka" && l.LangName != "ko"), parallelOptions, (Language lan) =>
                 {
                     try
                     {
