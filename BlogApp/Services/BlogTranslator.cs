@@ -106,12 +106,9 @@ namespace BlogApp.Services
 
                         try
                         {
-                            Console.WriteLine($"Desc: {lan.LangName}");
-
                             translatedBlog.Description = string.IsNullOrEmpty(blog.Description) ? "" :
                                 TranslateAsync(blog.Description, lan.LangName).Result.text;
 
-                            Console.WriteLine(translatedBlog.Description);
                         }
                         catch (Exception e)
                         {
