@@ -1,0 +1,202 @@
+/* Базовые сбросы и настройки */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f8fa;
+    color: #000; /* Черный текст */
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.spinner-container {
+    text-align: center;
+    display: none;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+.code-error{
+    font-weight: 700;
+    color: #db6767;
+    display: none;
+}
+
+.loading-text {
+    color: #333;
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Главный контейнер */
+.main-login-section {
+    display: flex;
+    max-width: 900px;
+    width: 100%;
+    background-color: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    padding: 40px;
+    gap: 40px;
+}
+
+/* Левая часть с QR-кодом */
+.code-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+}
+
+.code-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-top: 25px;
+    text-align: center;
+}
+
+/* Контейнер для QR-кода и кнопки */
+.code-data {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 200px;
+    min-height: 200px;
+}
+
+.code {
+    width: 200px;
+    height: 200px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+/* Кнопка обновления QR */
+.refresh-code-btn {
+    position: absolute;
+    background-color: rgba(29, 161, 242, 0.9); /* Синий с прозрачностью */
+    color: white;
+    border: none;
+    border-radius: 24px;
+    padding: 10px 20px;
+    font-weight: 600;
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.3s ease;
+    transform: translateY(10px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.code-data:hover .refresh-code-btn {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Правая часть с инструкциями */
+.description-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.instruction-list {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.instruction-element {
+    display: flex;
+    align-items: flex-start;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.instrucrion-number {
+    font-weight: 700;
+    margin-right: 5px;
+}
+
+.surrounded {
+    display: inline-block;
+    background-color: #e8f4fc;
+    color: #1da1f2;
+    font-family: monospace;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 600;
+    border: 1px solid #c5e3fc;
+}
+
+/* Стили для кнопок */
+.btn-list {
+    margin-top: 30px;
+}
+
+.bot-auth-btn {
+    width: 100%;
+    background-color: #1da1f2; /* Синий цвет */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    box-shadow: 0 4px 6px rgba(29, 161, 242, 0.2);
+}
+
+.bot-auth-btn a{
+    color: white;
+    text-decoration: none;
+}
+
+.bot-auth-btn:hover {
+    background-color: #0d8bd9;
+}
+
+.refresh-code-btn:hover {
+    background-color: #0d8bd9;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .main-login-section {
+        flex-direction: column;
+        padding: 30px 20px;
+    }
+    
+    .code-title {
+        margin-bottom: 25px;
+    }
+    
+    .btn-list {
+        margin-top: 20px;
+    }
+}

@@ -1,0 +1,57 @@
+# изображения
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.svg
+*.webp
+*.mp4
+
+# БД и миграции
+*.db
+*.sqlite
+*.sqlite3
+*.mdf
+*.ldf
+*.sdf
+Migrations/
+
+## Конфиги и секреты ###
+appsettings.json
+appsettings.*.json
+secrets.json
+*.config
+connectionstrings.*.json
+
+# папки bin и obj (обычно для .NET)
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.cache
+*.vspscc
+*.vssscc
+
+# Логи и временные файлы
+*.log
+*.tmp
+*.temp
+
+# Файлы IDE (Visual Studio, Rider, VS Code)
+.idea/
+.vscode/
+launchSettings.json
+
+# NuGet и зависимости
+packages/
+.nuget/
+NuGet.exe
+*.nupkg
+project.lock.json
+
+# Другие папки и файлы
+blog_images/
+common_imgs/
+*.txt

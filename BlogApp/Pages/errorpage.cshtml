@@ -1,0 +1,52 @@
+﻿@page "/blog/error"
+
+@model ErrorStatusPageModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <link rel="stylesheet" href="~/blog/error/style.css">
+    <link rel="icon" href="~/common_imgs/icon/favicon.ico">
+    <link rel="canonical" href="https://bot-market.com/blog/main">
+</head>
+<body>
+    <section>
+        <div class="error-block">
+            <img src="~/common_imgs/status_bot.png" alt="">
+            <div class="error-info">
+                <span class="status-code">@Model.Code</span>
+                <span class="description">
+                    Your actions on the site led to an error
+                </span>
+                <a href="/blog/main/en" class="main-ref">home page</a>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
+
+@functions {
+    public class ErrorStatusPageModel : PageModel
+    {
+        public string Code { get; set; }
+
+        public IActionResult OnGet()
+        {
+            string? code = HttpContext.Request.Query["code"];
+
+            if (!string.IsNullOrEmpty(code))
+            {
+                Code = code;
+            }
+            else
+            {
+                Code = "404";
+            }
+
+            return Page();
+        }
+    }
+}

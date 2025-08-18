@@ -1,0 +1,824 @@
+﻿@page "/blog/{categoryalias}/{blogalias}/{lang}"
+@model SelectedBlogModel
+
+
+<!DOCTYPE html>
+<html lang="@Model.Lang" prefix="og: http://ogp.me/ns#">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="@Model.DescriptionToHead"/>
+    <meta name="keywords" content="bot-market, bot, telegram, bot creating, blog about telegram bots, telegram bot's shop" />
+    <meta name="robots" content="all" />
+    <title>@Model.SelectedBlog.Title</title>
+    <link rel="stylesheet" href="~/selectedBlog/style.css">
+    <link rel="stylesheet" href="~/comments/style.css"/>
+    <link rel="icon" href="~/common_imgs/icon/favicon.ico">
+    <link rel="canonical" href="https://bot-market.com/blog/@(Model.CatAlias)/@(Model.BlogAlias)/@Model.Lang" />
+    <link rel="amphtml" href="https://bot-market.com/amp/blog/@(Model.CatAlias)/@(Model.BlogAlias)/@Model.Lang" />
+    <script type="application/ld+json">
+        {
+        "@Html.Raw("@")context": "http://schema.org",
+        "@Html.Raw("@")type": "Blog",
+        "headline": "@Model.SelectedBlog.Title",
+        "image": @("https://bot-market.com" + Model.SelectedBlog.Image),
+        "description":"@Model.DescriptionToHead",
+        "url":"https://bot-market.com/blog/main/@Model.Lang"
+        }
+    </script>
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function (m, e, t, r, i, k, a) {
+        m[i] = m[i] || function () { (m[i].a = m[i].a || []).push(arguments) };
+        m[i].l = 1 * new Date();
+        for (var j = 0; j < document.scripts.length; j++) { if (document.scripts[j].src === r) { return; } }
+        k = e.createElement(t), a = e.getElementsByTagName(t)[0], k.async = 1, k.src = r, a.parentNode.insertBefore(k, a)
+        })
+        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+        ym(98263205, "init", {
+        clickmap: true,
+        trackLinks: true,
+        accurateTrackBounce: true
+        });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/98263205" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9PJ076SN2M"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-9PJ076SN2M');
+    </script>
+    <meta property="og:image" content="@("https://bot-market.com" + Model.SelectedBlog.Image == "" ? "/common_imgs/bot.png" : Model.SelectedBlog.Image)"/>
+    <meta property="og:site_name" content="@Model.SelectedTitle.HeadTitle BOT-MARKET"/>
+    <meta property="og:title" content="@Model.SelectedBlog.Title"/>
+    <meta property="og:description" content="@Model.DescriptionToHead"/>
+</head>
+<body>
+    <div class="full-screen-image-container">
+        <div class="hide-image">
+            <img src="~/common_imgs/remove.png"/>
+        </div>
+        <img class="full-image" src=""/>
+    </div>
+    <section>
+        <div class="header">
+            <div class="lang-block">
+                <div class="login-block">
+                    <a class="login-ref" href="/blog/authpage/login?redirect=@Model.HttpContext.Request.Path">
+                        Sign In
+                    </a>
+                    <div class="user-block">
+                        <span class="user-name">@Model.CurrentUser.UserName</span>
+                    </div>
+                </div>
+                <form asp-page="selectedblog" method="post">
+                    <input type="hidden" asp-for="IsChangeLanguage" value="true"/>
+                    <select asp-for="Lang" class="lang-select">
+                        @foreach (var lang in Model.Languages)
+                        {
+                            @if (lang.LangName == HttpContext.Session.GetString("lang"))
+                            {
+                                <option selected="selected" value="@lang.LangName">@lang.FullLangName</option>
+                            }
+                            else
+                            {
+                                <option value="@lang.LangName">@lang.FullLangName</option>
+                            }
+                        }
+                    </select>
+                    <button type="submit" class="translate-btn">ok</button>
+                </form>
+            </div>
+            <div class="author-short-data" dir=@(Model.Lang == "ar" ? "rtl" : "")>
+                <div class="s-title">
+                    <span>@Model.SelectedTitle.HeadTitle</span>
+                    <img class="title-logo-img" src="~/common_imgs/title_logo.png"/>
+                </div>
+            </div>
+            <div class="h-menu-line" dir=@(Model.Lang == "ar" ? "rtl" : "")>
+                <a href="/blog/main/@Model.Lang">@Model.SelectedTitle.MainRef</a>
+                <a href="/blog/all/@Model.Lang">@Model.SelectedTitle.BlogsRef</a>
+            </div>
+        </div>
+        <div class="main">
+            <div class="blog-part" dir=@(Model.Lang == "ar" ? "rtl" : "")>
+                <div class="blog-header">
+                    <span class="blog-title">
+                        @Html.Raw(Model.SelectedBlog.Title)
+                    </span>
+                    <div class="blog-info">
+                        <span class="blog-data">
+                            @Model.SelectedTitle.Publicated: @Model.SelectedBlog.DateOfPublish.ToShortDateString()
+                        </span>
+                        @if (Model.SelectedBlog.DateOfUpdate.ToShortDateString() != "01.01.0001")
+                        {
+                            <span class="blog-data">
+                                @Model.SelectedTitle.Updated: @Model.SelectedBlog.DateOfUpdate.ToShortDateString()
+                            </span>
+                        }
+                    </div>
+                    <div class="tag-list">
+                        @if (Model.SelectedBlog.Tags.Count > 0)
+                        {
+                            foreach (Tag tag in Model.SelectedBlog.Tags)
+                            {
+                                <a class="tag" href="/blog/all/tag/@tag.TagName/@Model.Lang">#@tag.TagName</a>
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="blog-units-intro">
+                    <div class="blog-intro">
+
+                        <div class="blog-text">
+                            @Html.Raw(Model.SelectedBlog.Description)
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.SelectedBlog.Image))
+                        {
+                            <img class="blog-image imagination" src="@Model.SelectedBlog.Image" alt="@Model.SelectedBlog.Title">
+                        }
+                        else
+                        {
+                            <img class="blog-image imagination" src="~/common_imgs/bot.png" alt="@Model.SelectedBlog.Title">
+                        }
+                    </div>
+                    <div class="units-intro">
+
+                        <div class="units">
+
+                            @{
+                                int secCount = 1;
+                            }
+
+                            @foreach (var sec in Model.SelectedBlog.Sections)
+                            {
+
+                                int subCount = 1;
+
+                                <a href="#sec-@sec.Id" class="h-section">
+                                    <span>@secCount.</span> @Html.Raw(sec.Title)
+                                </a>
+
+                                foreach (var sub in sec.Subsections)
+                                {
+                                    <a href="#sub-@sub.Id" class="h-subsection">
+                                        <span>@secCount.@subCount</span> @Html.Raw(sub.Title)
+                                    </a>
+
+                                    subCount++;
+                                }
+
+                                secCount++;
+                            }
+
+                            @if (!string.IsNullOrEmpty(Model.SelectedBlog.VideoName) && !string.IsNullOrEmpty(Model.SelectedBlog.VideoPath))
+                            {
+                                <a href="#video-ref" class="h-section">
+                                    @Html.Raw(Model.SelectedBlog.VideoName)
+                                </a>
+                            }
+
+                        </div>
+                    </div>
+                </div>
+                <div class="blog-main-part">
+
+                    @{
+                        int counter = 1;
+                    }
+
+                    @foreach (var sec in Model.SelectedBlog.Sections)
+                    {
+                        if (counter == 1)
+                        {
+                            <h1 id="sec-@sec.Id" class="section-title">
+                                @Html.Raw(sec.Title)
+                            </h1>
+                        }
+                        else
+                        {
+                            <h2 id="sec-@sec.Id" class="section-title">
+                                @Html.Raw(sec.Title)
+                            </h2>
+                        }
+
+                        counter++;
+
+                        foreach (var sub in sec.Subsections)
+                        {
+                            <h3 id="sub-@sub.Id" class="subsection-title">
+                                @Html.Raw(sub.Title)
+                            </h3>
+
+                            int pars = 1;
+
+                            foreach (var par in sub.Paragraphs)
+                            {
+                                <div class="blog-paragraph">
+                                    <div class="blog-text">@Html.Raw(par.Text)</div>
+                                    @if (!string.IsNullOrEmpty(par.Image))
+                                    {
+                                        <div class="blog-image-container">
+                                            <img class="p-blog-image imagination" src="@par.Image" alt="@sub.Title-@pars">
+                                        </div>
+
+                                        pars++;
+                                    }
+                                </div>
+                            }
+                        }
+                    }
+
+
+                    @if (!string.IsNullOrEmpty(Model.SelectedBlog.VideoName) && !string.IsNullOrEmpty(Model.SelectedBlog.VideoPath))
+                    {
+                        <div id="video-ref" class="video-container">
+                            <h3 class="section-title">@Model.SelectedBlog.VideoName</h3>
+                            <iframe allowfullscreen src="@Model.SelectedBlog.VideoPath"></iframe>
+                        </div>
+                    }
+
+
+                </div>
+                <div class="comment-container">
+                    <input class="user-id-input" value="@Model.CurrentUser.Id" type="hidden">
+                    <input class="blog-alias-input" value="@Model.SelectedBlog.Alias" type="hidden">
+                    <input class="lang-code-input" value="@Model.Lang" type="hidden">
+                    <div class="comment-title">
+                        Comments
+                    </div>
+                    @if (Model.CurrentUser?.Id > 0)
+                    {
+                        <div class="comment-form">
+                            <div class="comment-form-group">
+                                <textarea class="comment-area"></textarea>
+                            </div>
+                            <button id="publish-comment-button" class="comment-btn">
+                                publish
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="unauth-block">
+                            <a class="user-login-ref" href="/blog/authpage/login?redirect=@Model.HttpContext.Request.Path">Log In</a>
+                            to write comments
+                        </div>
+                    }
+                    
+                    <div class="comment-list">
+                        @if(Model.Comments != null)
+                        {
+                            if(Model.Comments.Count > 0)
+                            {
+                                foreach (var comment in Model.Comments)
+                                {
+                                    <div class=@(comment.BotUserId == Model.CurrentUser.Id ? "user-comment" : "comment")>
+                                        <div class="comment-data">
+                                            @if (comment.BotUserId != Model.CurrentUser.Id)
+                                            {
+                                                <span class="comment-user">
+                                                    @comment.BotUser.UserName
+                                                </span>
+                                            }
+                                            <div class="comment-text-data">
+
+                                                @if (comment.Language.LangName != Model.Lang)
+                                                {
+                                                    @if (comment.CommentTranslations.FirstOrDefault(c => c.LangCode == Model.Lang) != null)
+                                                    {
+                                                        <span comment-id-value="@comment.Id" tran-text="@comment.CommentTranslations.First(c => c.LangCode == Model.Lang).Text" orig-text="@comment.TextContent" class="comment-text-value unique-text-value">
+                                                            @comment.CommentTranslations.First(c => c.LangCode == Model.Lang).Text
+                                                            @{
+                                                                comment.IsTranslated = true;
+                                                            }
+                                                        </span> 
+                                                    }
+                                                    else
+                                                    {
+                                                        <span comment-id-value="@comment.Id" orig-text="@comment.TextContent" tran-text="" class="comment-text-value unique-text-value">
+                                                            @comment.TextContent
+                                                        </span>
+                                                    }
+                                                }
+                                                else
+                                                {
+
+                                                    <span comment-id-value="@comment.Id" orig-text="@comment.TextContent" tran-text="" class="comment-text-value unique-text-value">
+                                                        @comment.TextContent
+                                                        @{
+                                                            comment.IsNoNeedTranslateButton = true;
+                                                        }
+                                                    </span>
+                                                }
+
+                                                <div class="comment-buttons">
+                                                    @if (!comment.IsNoNeedTranslateButton)
+                                                    {
+                                                        if (comment.IsTranslated)
+                                                        {
+                                                            <button comment-id-value="@comment.Id" for-translate="false" class="ctbtn comment-translation-btn">show original</button>
+                                                        }
+                                                        else
+                                                        {
+                                                            <button comment-id-value="@comment.Id" for-translate="true" class="ctbtn comment-translation-btn">translate</button>
+                                                        }
+                                                    }
+                                                    @if (Model.CurrentUser.Id > 0)
+                                                    {
+                                                        if (Model.CurrentUser.Id != comment.BotUserId)
+                                                        {
+                                                            <button answer-open-button-id="@comment.Id" class="comment-btn show-answer-form-btn">answer</button>
+                                                        }
+                                                    }
+                                                </div>
+                                                @if (Model.CurrentUser.Id > 0)
+                                                {
+                                                    if (Model.CurrentUser.Id != comment.BotUserId)
+                                                    {
+                                                        <div class="answer-form" answer-form-id="@comment.Id">
+                                                            <input anser-input-id="@comment.Id" type="text" class="comment-answer-input">
+                                                            <input type="hidden">
+                                                            <div class="answer-buttons">
+                                                                <button answer-publish-button-id="@comment.Id" class="comment-btn publish-answer-btn">publish</button>
+                                                                <button answer-close-button-id="@comment.Id" class="close-answer-form-btn">close</button>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="comment-answers" answer-comment-id="@comment.Id">
+                                            @if (comment.CommentAnswers != null)
+                                            {
+                                                if (comment.CommentAnswers.Count > 0)
+                                                {
+                                                    foreach (var answer in comment.CommentAnswers)
+                                                    {
+                                                        <div class=@(answer.BotUserId == Model.CurrentUser.Id ? "user-comment" : "comment")>
+                                                            @if (answer.BotUserId != Model.CurrentUser.Id)
+                                                            {
+                                                                <span class="comment-user">@answer.BotUser.UserName</span>
+                                                            }
+                                                            <div>
+                                                                @if (answer.Language.LangName != Model.Lang)
+                                                                {
+                                                                    if (answer.AnswerTranslations.FirstOrDefault(at => at.LangCode == Model.Lang) != null)
+                                                                    {
+                                                                        <span answer-id-value="@answer.Id" tran-text="@answer.AnswerTranslations.First(at => at.LangCode == Model.Lang).Text" orig-text="@answer.TextContent" class="comment-text-value answer-text-value">
+                                                                            @answer.AnswerTranslations.First(at => at.LangCode == Model.Lang).Text
+                                                                            @{
+                                                                                answer.IsTranslated = true;
+                                                                            }
+                                                                        </span>
+
+
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span answer-id-value="@answer.Id" tran-text="" orig-text="@answer.TextContent" class="comment-text-value answer-text-value">
+                                                                            @answer.TextContent
+                                                                        </span>
+                                                                    }
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span answer-id-value="@answer.Id" tran-text="" orig-text="@answer.TextContent" class="comment-text-value answer-text-value">
+                                                                        @answer.TextContent
+                                                                        @{
+                                                                            answer.IsNoNeedTranslateButton = true;
+                                                                        }
+                                                                    </span>
+                                                                }
+                                                                <div class="comment-buttons">
+                                                                    @if (!answer.IsNoNeedTranslateButton)
+                                                                    {
+                                                                        if (answer.IsTranslated)
+                                                                        {
+                                                                            <button for-translate="false" answer-id-value="@answer.Id" class="com-ans-tr-btn comment-translation-btn">
+                                                                                show original
+                                                                            </button>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <button for-translate="true" answer-id-value="@answer.Id" class="com-ans-tr-btn comment-translation-btn">
+                                                                                translate
+                                                                            </button>
+                                                                        }
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="comment-list-empty">Comment list is empty. Start now!</div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="comment-list-empty">Comment list is empty. Start now!</div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="side-bar" dir=@(Model.Lang == "ar" ? "rtl" : "")>
+
+                <div style="display:flex; flex-direction:column">
+                    <div style="margin-bottom:25px;">
+                        @if (Model.TagBlogs != null)
+                        {
+                            if (Model.TagBlogs.Count() > 0)
+                            {
+
+                                if (Model.TagBlogs.Where(b => b.Id != Model.SelectedBlog.Id && b.IsArchived == false).Count() > 0)
+                                {
+                                    if (Model.TagBlogs.Where(b => b.Id != Model.SelectedBlog.Id && b.IsArchived == false).Count() <= 5)
+                                    {
+                                        <div class="same-posts">
+                                            <div class="same-blog-list">
+                                                @foreach (Blog blog in Model.TagBlogs.Where(b => b.Id != Model.SelectedBlog.Id && b.IsArchived == false))
+                                                {
+                                                    <a href="/blog/@Model.SelectedCategory.Alias/@blog.Alias/@Model.Lang" class="same-blog-group">
+                                                        <div class="same-blog-img-container">
+                                                            @if (!string.IsNullOrEmpty(blog.Image))
+                                                            {
+                                                                <img src="@blog.Image" alt="@blog.Title">
+                                                            }
+                                                            else
+                                                            {
+                                                                <img src="~/common_imgs/bot.png" alt="">
+                                                            }
+                                                        </div>
+                                                        <div class="same-blog-title">
+                                                            @blog.Title
+                                                        </div>
+                                                    </a>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="same-posts">
+                                            <div class="same-blog-list">
+                                                @foreach (Blog blog in Model.TagBlogs.Where(b => b.Id != Model.SelectedBlog.Id && b.IsArchived == false).Take(5))
+                                                {
+                                                    <a href="/blog/@Model.SelectedCategory.Alias/@blog.Alias/@Model.Lang" class="same-blog-group">
+                                                        <div class="same-blog-img-container">
+                                                            @if (!string.IsNullOrEmpty(blog.Image))
+                                                            {
+                                                                <img src="@blog.Image" alt="@blog.Title">
+                                                            }
+                                                            else
+                                                            {
+                                                                <img src="~/common_imgs/bot.png" alt="">
+                                                            }
+                                                        </div>
+                                                        <div class="same-blog-title">
+                                                            @blog.Title
+                                                        </div>
+                                                    </a>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            }
+                        }
+                    </div>
+
+                    <div>
+                        @if (Model.SelectedCategory.Blogs.Where(b => b.IsArchived == false).Count() > 0)
+                        {
+                            if (Model.SelectedCategory.Blogs.Where(b => b.IsArchived == false).Count() <= 5)
+                            {
+                                <div class="same-posts">
+                                    <span class="r-title">
+                                        @Model.SelectedTitle.SamePosts
+                                    </span>
+                                    <div class="same-blog-list">
+                                        @foreach (Blog blog in Model.SelectedCategory.Blogs.Where(b => b.IsArchived == false))
+                                        {
+                                            <a href="/blog/@Model.SelectedCategory.Alias/@blog.Alias/@Model.Lang" class="same-blog-group">
+                                                <div class="same-blog-img-container">
+                                                    @if (!string.IsNullOrEmpty(blog.Image))
+                                                    {
+                                                        <img src="@blog.Image" alt="@blog.Title">
+                                                    }
+                                                    else
+                                                    {
+                                                        <img src="~/common_imgs/bot.png" alt="">
+                                                    }
+                                                </div>
+                                                <div class="same-blog-title">
+                                                    @blog.Title
+                                                </div>
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="same-posts">
+                                    <span class="r-title">
+                                        @Model.SelectedTitle.SamePosts
+                                    </span>
+                                    <div class="same-blog-list">
+                                        @foreach (Blog blog in Model.SelectedCategory.Blogs.Where(b => b.IsArchived == false).OrderByDescending(b => b.Id).Take(5))
+                                        {
+                                            <a href="/blog/@Model.SelectedCategory.Alias/@blog.Alias/@Model.Lang" class="same-blog-group">
+                                                <div class="same-blog-img-container">
+                                                    @if (!string.IsNullOrEmpty(blog.Image))
+                                                    {
+                                                        <img src="@blog.Image" alt="@blog.Title">
+                                                    }
+                                                    else
+                                                    {
+                                                        <img src="~/common_imgs/bot.png" alt="">
+                                                    }
+                                                </div>
+                                                <div class="same-blog-title">
+                                                    @blog.Title
+                                                </div>
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <div class="rubrics">
+                    <span class="r-title">
+                        @Model.SelectedTitle.CatTitle
+                    </span>
+                    <div class="cat-list">
+                        @if (Model.Categories.Count() > 0)
+                        {
+                            foreach (var cat in Model.Categories)
+                            {
+                                <div class="cat-group">
+                                    @if (Model.Lang != "ar")
+                                    {
+                                        <img src="~/common_imgs/arrow.png" class="rubric-img" alt="">
+                                    }
+                                    <a href="/blog/all/@cat.Alias/@HttpContext.Session.GetString("lang")" class="cat-element">@cat.CategoryName</a>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer" dir=@(Model.Lang == "ar" ? "rtl" : "")>
+            <span class="f-title">© @DateTime.Now.Year.ToString() @Model.SelectedTitle.HeadTitle bot-market</span>
+            <span class="f-desc">
+                @Model.SelectedTitle.WarningInfo
+            </span>
+            <div class="link-container">
+                <a href="#" class="link-ref">
+                    <img src="~/common_imgs/icons8-instagram-96.png" />
+                </a>
+                <a href="#" class="link-ref">
+                    <img src="~/common_imgs/icons8-telegram-96.png" />
+                </a>
+                <a href="#" class="link-ref">
+                    <img src="~/common_imgs/icons8-youtube-96.png" />
+                </a>
+            </div>
+        </div>
+    </section>
+    <div class="mini-nav-pannel-container" dir=@(Model.Lang == "ar" ? "rtl" : "")>
+        <div class="mini-nav-pannel" pos=@(Model.Lang == "ar" ? "l" : "ri")>
+            <div class="mn-pannel-refs">
+                @foreach (var sec in Model.SelectedBlog.Sections)
+                {
+                    <a href="#sec-@sec.Id" class="mn-section">
+                        @Html.Raw(sec.Title)
+                    </a>
+                }
+                <a href="#video-ref" class="mn-section">
+                    @Html.Raw(Model.SelectedBlog.VideoName)
+                </a>
+            </div>
+        </div>
+    </div>
+    <script src="~/selectedBlog/script.js"></script>
+    <script src="~/comments/script.js"></script>
+</body>
+</html>
+
+
+@functions{
+    public class SelectedBlogModel : PageModel
+    {
+        private IBlogRepository blogRepository;
+
+        private ICategoryRepository categoryRepository;
+
+        private ICommentRepository commentRepository;
+
+        public SelectedBlogModel(IBlogRepository blogRepository, ICategoryRepository categoryRepository, ICommentRepository commentRepository)
+        {
+            this.commentRepository = commentRepository;
+
+            this.blogRepository = blogRepository;
+
+            this.categoryRepository = categoryRepository;
+        }
+
+        public Blog SelectedBlog { get; set; }
+
+        public List<Category> Categories { get; set; } = new List<Category>();
+
+        [BindProperty]
+        public string Lang { get; set; }
+
+        public BotUserShortData CurrentUser { get; set; } = new BotUserShortData();
+
+        public Title SelectedTitle { get; set; }
+
+        public List<Language> Languages { get; set; } = new List<Language>();
+
+        public List<Comment> Comments { get; set; }
+
+        public Category SelectedCategory { get; set; }
+
+        public string CatAlias { get; set; }
+
+        public string BlogAlias { get; set; }
+
+        public List<Blog>? TagBlogs { get; set; }
+
+        public string DescriptionToHead { get; set; }
+
+        [BindProperty]
+        public bool IsChangeLanguage { get; set; } = false;
+
+        public async Task<IActionResult> OnGetAsync(string categoryalias, string blogalias, string lang)
+        {
+            string? botUserJsonString = HttpContext.Session.GetString("current_bot_user");
+
+            if (!string.IsNullOrEmpty(botUserJsonString))
+            {
+                CurrentUser = JsonConvert.DeserializeObject<BotUserShortData>(botUserJsonString);
+            }
+
+            try
+            {
+                SelectedBlog = await blogRepository.GetBlogByAliasAndLanguageAsync(blogalias, lang);
+            }
+            catch (Exception)
+            {
+                return Redirect("/blog/main");
+            }
+
+            try
+            {
+                if (SelectedBlog.Tags != null)
+                {
+                    if (SelectedBlog.Tags.Count() > 0)
+                    {
+                        TagBlogs = await blogRepository.GetSimilarBlogsByTagsAsync(SelectedBlog.Tags, lang);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                TagBlogs = null;
+            }
+
+            Categories = await categoryRepository.GetCategoriesOnSpecificLanguageAsync(lang);
+
+            SelectedCategory = Categories.First(c => c.Alias == categoryalias);
+
+            SelectedTitle = await blogRepository.GetTitleByLangCodeAsync(lang);
+
+            List<Language> languages = await blogRepository.GetAllLangsAsync();
+
+            DescriptionToHead = SelectedBlog.Description;
+
+            if (SelectedBlog.Description.Length >= 190)
+            {
+                DescriptionToHead = GetSubstringOfFullWords(SelectedBlog.Description, 190);
+            }
+            else
+            {
+                DescriptionToHead = SelectedBlog.Description;
+            }
+
+            foreach (var language in languages)
+            {
+                Blog blog;
+
+                try
+                {
+                    blog = language.Blogs.First(b => b.Alias == blogalias);
+
+                    Languages.Add(language);
+                }
+                catch
+                {
+                }
+            }
+
+            Comments = await commentRepository.GetBlogCommentsAsync(SelectedBlog.Id);
+
+            Lang = lang;
+
+            CatAlias = categoryalias;
+
+            BlogAlias = blogalias;
+
+            HttpContext.Session.SetString("selected_categoryalias", categoryalias);
+
+            HttpContext.Session.SetString("selected_blogalias", blogalias);
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            string? botUserJsonString = HttpContext.Session.GetString("current_bot_user");
+
+            if (!string.IsNullOrEmpty(botUserJsonString))
+            {
+                CurrentUser = JsonConvert.DeserializeObject<BotUserShortData>(botUserJsonString);
+            }
+
+            if (IsChangeLanguage)
+            {
+                try
+                {
+                    string? categoryAlias = HttpContext.Session.GetString("selected_categoryalias");
+
+                    string? blogAlias = HttpContext.Session.GetString("selected_blogalias");
+
+                    CatAlias = categoryAlias;
+
+                    BlogAlias = blogAlias;
+
+                    HttpContext.Session.SetString("lang", Lang);
+
+                    return Redirect($"/blog/{categoryAlias}/{blogAlias}/{Lang}");
+                }
+                catch (Exception)
+                {
+                    return Page();
+                }
+            }
+
+            return Page();
+        }
+
+        private string GetSubstringOfFullWords(string initString, int maxElementsCount)
+        {
+            string subString = initString.Substring(0, maxElementsCount);
+
+            string element = subString.Substring(maxElementsCount - 1, 1);
+
+            while(element != " ")
+            {
+                maxElementsCount--;
+
+                element = subString.Substring(maxElementsCount - 1, 1);
+            }
+
+            string initStringWithTags = initString.Substring(0, maxElementsCount);
+
+            char startTag = '<';
+            char endTag = '>';
+
+            if (initStringWithTags.IndexOf(startTag) > -1)
+            {
+                int startIndex = initStringWithTags.IndexOf(startTag);
+                int endIndex = initStringWithTags.IndexOf(endTag);
+
+                while (startIndex > -1 && endIndex > -1)
+                {
+                    initStringWithTags = initStringWithTags.Remove(startIndex, endIndex - startIndex + 1);
+
+                    startIndex = initStringWithTags.IndexOf(startTag);
+                    endIndex = initStringWithTags.IndexOf(endTag);
+                }
+            }
+
+            return initStringWithTags;
+        }
+    }
+}

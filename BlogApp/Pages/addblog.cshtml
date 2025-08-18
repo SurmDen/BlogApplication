@@ -1,0 +1,232 @@
+﻿@page "/blog/adminpage/blogs/add"
+@model AddBlogModel
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание поста</title>
+    <link rel="stylesheet" href="~/blog/admin/addblog/style.css">
+    <link rel="stylesheet" href="~/blog/admin/addblog/specific/style.css">
+    <link rel="icon" href="~/common_imgs/icon/favicon.ico">
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+</head>
+<body>
+    <div class="load-box">
+        <span class="loader"></span>
+    </div>
+    <div class="error-box">
+        <div class="error">
+            <span class="error-message">
+                Все поля в форме должны быть заполнены
+            </span>
+            <button class="error-btn">
+                ок
+            </button>
+        </div>
+    </div>
+    <section>
+        <div class="header">
+            <div class="h-menu-line">
+                <span class="admin-title">
+                    Панель администратора
+                </span>
+                <div class="settings">
+                    <a href="/blog/adminpage/user/edit"><img src="~/common_imgs/settings.png" alt=""></a>
+                    <a href="/blog/adminpage/login"><img src="~/common_imgs/logout2.png" alt=""></a>
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            <div class="side">
+                <div class="admin-short-info">
+                    <div class="admin-info-group">
+                        <img src="~/common_imgs/admin_image.png" alt="">
+                        <input class="user-id" type="hidden" value="@Model.CurrentUser.Id">
+                        <span>@Model.CurrentUser.UserName</span>
+                    </div>
+                </div>
+                <div class="side-bar">
+                    <a href="/blog/adminpage/bloglist" class="working-element ">Все публикации</a>
+                    <a href="/blog/adminpage/blogs/add" class="working-element working-element-active">Добавить статью</a>
+                    <a href="/blog/adminpage/categories/add" class="working-element">Категории, теги</a>
+                </div>
+            </div>
+            <div class="work-part">
+                <form class="blog-form" enctype="multipart/form-data">
+                    <div class="blog-group g">
+                        <div class="input-group">
+                            <label>Название поста</label>
+                            <input type="text" class="blog-input blog-title">
+                        </div>
+                        <div class="area-group">
+                            <label>Введение</label>
+                            <div class="blog-desc" id="editor1"></div>
+                        </div>
+                        <div class="img-group">
+                            <div class="img-block">
+                                <label for="add-blog-img">
+                                    <img src="~/common_imgs/add_img.png" alt="">
+                                </label>
+                                <img src="" class="image-preview add-blog-img" alt="">
+                            </div>
+                            <input id="add-blog-img" accepts=".jpg, .jpeg, .png, .svg" type="file" class="blog-input add-img">
+                        </div>
+
+                        <div class="section-group sg-1">
+                            <div class="move-buttons-group">
+                                <button class="move-btn move-btn-up">
+                                    <img src="~/blog/admin/addblog/specific/move_arrow.png" />
+                                </button>
+                                <button class="move-btn move-btn-down">
+                                    <img src="~/blog/admin/addblog/specific/move_arrow.png" />
+                                </button>
+                            </div>
+                            <div class="input-group">
+                                <label>Название раздела</label>
+                                <input type="text" class="blog-input section-title">
+                            </div>
+
+                            <div class="subsection-group subg-1">
+                                <div class="move-buttons-group">
+                                    <button class="move-btn move-btn-up">
+                                        <img src="~/blog/admin/addblog/specific/move_arrow.png" />
+                                    </button>
+                                    <button class="move-btn move-btn-down">
+                                        <img src="~/blog/admin/addblog/specific/move_arrow.png" />
+                                    </button>
+                                </div>
+                                <div class="input-group">
+                                    <label>Название подраздела</label>
+                                    <input type="text" class="blog-input subsection-title">
+                                </div>
+
+                                <div class="paragraph-group">
+                                    <div class="move-buttons-group">
+                                        <button class="move-btn move-btn-up">
+                                            <img src="~/blog/admin/addblog/specific/move_arrow.png" />
+                                        </button>
+                                        <button class="move-btn move-btn-down">
+                                            <img src="~/blog/admin/addblog/specific/move_arrow.png" />
+                                        </button>
+                                    </div>
+                                    <div class="area-group">
+                                        <label>Параграф</label>
+                                        <div class="paragraph" id="editor2"></div>
+                                    </div>
+                                    <div class="img-group">
+                                        <div class="img-block">
+                                            <label for="add-par-img-1">
+                                                <img src="~/common_imgs/add_img.png" alt="">
+                                            </label>
+                                            <img src="" class="image-preview add-par-img-1" alt="">
+                                        </div>
+                                        <input id="add-par-img-1" accepts=".jpg, .jpeg, .png, .svg" type="file" class="paragraph-img blog-input add-img">
+                                    </div>
+                                </div>
+                                <div class="add-paragraph-block add-block">
+                                    <button id="subg-1">добавить параграф</button>
+                                </div>
+                            </div>
+                            <div class="add-subsection-block add-block">
+                                <button id="sg-1">добавить подраздел</button>
+                            </div>
+                        </div>
+                        <div class="add-section-block add-block">
+                            <button id="g">добавить раздел</button>
+                        </div>
+                    </div>
+                    <div class="tag-form">
+                        <span>Выберите теги для статьи</span>
+                        <div class="tag-list">
+                            @if (Model.Tags.Count> 0)
+                            {
+                                foreach (var tag in Model.Tags)
+                                {
+                                    <div class="tag-group">
+                                        <label for="@tag.Id">@tag.TagName</label>
+                                        <input type="checkbox" class="tag checkbox" name="@tag.TagName" id="@tag.Id" />
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="pub-btn-container">
+                        <div class="select">
+                            <select class="format">
+                                <option selected disabled>Выберите категорию</option>
+                                @if (Model.Categories.Count > 0)
+                                {
+                                    foreach (var cat in Model.Categories)
+                                    {
+                                        <option value="@cat.Id">@cat.CategoryName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <button class="publish-btn">
+                            публикация
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="footer">
+        </div>
+    </section>
+    <script src="~/blog/admin/addblog/specific/script.js"></script>
+    <script src="~/blog/admin/addblog/script.js"></script>
+    <script>
+        const quill1 = new Quill('#editor1', {
+            theme: 'snow'
+        });
+
+        const quill2 = new Quill('#editor2', {
+            theme: 'snow'
+        });
+    </script>
+</body>
+</html>
+
+
+@functions{
+    [Authorize(Roles = "Admin", AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+    public class AddBlogModel : PageModel
+    {
+        private IUserRepository userRepository;
+        private IBlogRepository blogRepository;
+        private ICategoryRepository categoryRepository;
+
+        public AddBlogModel(IUserRepository userRepository, IBlogRepository blogRepository, ICategoryRepository categoryRepository)
+        {
+            this.userRepository = userRepository;
+            this.blogRepository = blogRepository;
+            this.categoryRepository = categoryRepository;
+        }
+
+        public User CurrentUser { get; set; }
+
+        public List<Category> Categories { get; set; } = new List<Category>();
+
+        public List<Tag> Tags { get; set; } = new List<Tag>();
+
+        public async Task<IActionResult> OnGetAsync()
+        {
+            string currentJsonUser = HttpContext.Session.GetString("currentuser");
+
+            if (!string.IsNullOrEmpty(currentJsonUser))
+            {
+                CurrentUser = JsonConvert.DeserializeObject<User>(currentJsonUser);
+            }
+
+            Categories = await categoryRepository.GetCategoriesOnSpecificLanguageAsync("ru");
+
+            Tags = await blogRepository.GetSimplifiedTags();
+
+            return Page();
+        }
+    }
+}

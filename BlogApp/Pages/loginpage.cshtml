@@ -1,0 +1,111 @@
+﻿@page "/blog/adminpage/login"
+@model LoginPageModel
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вход</title>
+    <link rel="stylesheet" href="~/blog/admin/login/style.css">
+    <link rel="icon" href="~/common_imgs/icon/favicon.ico">
+</head>
+<body>
+    @if (Model.IsError)
+    {
+        <div class="error-box">
+            <div class="error">
+                <span class="error-message">
+                    @Model.ErrorMessage
+                </span>
+                <button class="error-btn">
+                    ок
+                </button>
+            </div>
+        </div>
+    }
+    <div class="login-page">
+        <div class="form">
+            <form asp-page="loginpage" method="post" class="login-form">
+                <input type="text" asp-for="SigningData.UserName" placeholder="имя пользователя" />
+                <input type="password" asp-for="SigningData.Password" placeholder="пароль" />
+                <button type="submit">войти</button>
+            </form>
+        </div>
+    </div>
+    <script src="~/blog/admin/login/script.js"></script>
+</body>
+</html>
+
+
+@functions{
+    public class LoginPageModel : PageModel
+    {
+        private IUserRepository userRepository;
+
+        public LoginPageModel(IUserRepository userRepository)
+        {
+            this.userRepository = userRepository;
+        }
+
+        [BindProperty]
+        public SigningData SigningData { get; set; }
+
+        public bool IsError { get; set; } = false;
+
+        public string ErrorMessage { get; set; }
+
+        public async Task<IActionResult> OnGetAsync()
+        {
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+
+            if (!string.IsNullOrEmpty(SigningData.UserName) && !string.IsNullOrEmpty(SigningData.Password))
+            {
+
+                User? user = await userRepository.GetUserByNameAndPasswordAsync(SigningData);
+
+                if (user != null)
+                {
+
+                    SigningModel signingModel = new SigningModel()
+                    {
+                            UserName = user.UserName,
+                            UserEmail = user.Email,
+                            UserRole = user.Role.RoleName
+                    };
+
+                    SigningManager signingManager = new SigningManager();
+
+                    await signingManager.LoginAsync(signingModel, HttpContext);
+
+                    user.Password = "";
+
+                    HttpContext.Session.SetString("currentuser", JsonConvert.SerializeObject(user));
+
+                    return Redirect("/blog/adminpage/bloglist");
+                }
+                else
+                {
+                    IsError = true;
+
+                    ErrorMessage = "Неверно указаны логин или пароль";
+                }
+            }
+            else
+            {
+                IsError = true;
+
+                ErrorMessage = "Все поля в форме должны быть заполнены";
+            }
+
+
+            return Page();
+
+        }
+    }
+}

@@ -1,0 +1,179 @@
+﻿@page "/blog/adminpage/user/edit"
+@model EditUserModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование</title>
+    <link rel="stylesheet" href="~/blog/admin/login/style.css">
+    <link rel="icon" href="~/common_imgs/icon/favicon.ico">
+</head>
+<body>
+    @if (Model.IsError)
+    {
+        <div class="error-box">
+            <div class="error">
+                <span class="error-message">
+                    @Model.ErrorMessage
+                </span>
+                <button class="error-btn">
+                    ок
+                </button>
+            </div>
+        </div>
+    }
+    <div class="login-page">
+        <div class="form">
+            <form asp-page="edituser" method="post" class="login-form">
+                <input type="text" asp-for="UserName" placeholder="имя пользователя" />
+                <input type="password" asp-for="OldPassword" placeholder="текущий пароль" />
+                <input type="password" asp-for="FreshPassword" placeholder="новый пароль" />
+                <button type="submit">обновить</button>
+            </form>
+        </div>
+    </div>
+    <script src="~/blog/admin/login/script.js"></script>
+</body>
+</html>
+
+
+@functions {
+    [Authorize(Roles = "Admin", AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+    public class EditUserModel : PageModel
+    {
+        private IUserRepository userRepository;
+
+        public EditUserModel(IUserRepository userRepository)
+        {
+            this.userRepository = userRepository;
+        }
+
+        [BindProperty]
+        public SigningData SigningData { get; set; }
+
+        public bool IsError { get; set; } = false;
+
+        public string ErrorMessage { get; set; }
+
+        [BindProperty]
+        public string UserName { get; set; }
+
+        [BindProperty]
+        public string OldPassword { get; set; }
+
+        [BindProperty]
+        public string FreshPassword { get; set; }
+
+        public User CurrentUser { get; set; }
+
+        public async Task<IActionResult> OnGetAsync()
+        {
+            string? currentUserJsonString = HttpContext.Session.GetString("currentuser");
+
+            if (!string.IsNullOrEmpty(currentUserJsonString))
+            {
+                CurrentUser = JsonConvert.DeserializeObject<User>(currentUserJsonString);
+
+                UserName = CurrentUser.UserName;
+            }
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+
+            string? currentUserJsonString = HttpContext.Session.GetString("currentuser");
+
+            if (!string.IsNullOrEmpty(currentUserJsonString))
+            {
+                CurrentUser = JsonConvert.DeserializeObject<User>(currentUserJsonString);
+            }
+
+            if (!string.IsNullOrEmpty(FreshPassword) && !string.IsNullOrEmpty(OldPassword))
+            {
+                Console.WriteLine(CurrentUser.Id);
+
+                User currentUserFromDb = await userRepository.GetUserByIdAsync(CurrentUser.Id);
+
+                if (string.IsNullOrEmpty(UserName))
+                {
+                    ErrorMessage = "введите имя пользователя";
+
+                    IsError = true;
+                }
+                else
+                {
+                    if (currentUserFromDb.UserName != UserName)
+                    {
+                        currentUserFromDb.UserName = UserName;
+                    }
+
+                    if (currentUserFromDb.Password == OldPassword)
+                    {
+                        currentUserFromDb.Password = FreshPassword;
+
+                        await userRepository.UpdateUserAsync(currentUserFromDb);
+
+                        currentUserFromDb.Password = "";
+
+                        HttpContext.Session.SetString("currentuser" ,JsonConvert.SerializeObject(currentUserFromDb));
+
+                        return Redirect("/adminpage/bloglist");
+                    }
+                    else
+                    {
+                        ErrorMessage = "неверно указан текущий пароль";
+
+                        IsError = true;
+                    }
+                }
+
+            }
+            else if (string.IsNullOrEmpty(FreshPassword) && !string.IsNullOrEmpty(OldPassword))
+            {
+                ErrorMessage = "введите новый пароль";
+
+                IsError = true;
+            }
+            else if (!string.IsNullOrEmpty(FreshPassword) && string.IsNullOrEmpty(OldPassword))
+            {
+                ErrorMessage = "введите старый пароль";
+
+                IsError = true;
+            }
+            else
+            {
+                User currentUserFromDb = await userRepository.GetUserByIdAsync(CurrentUser.Id);
+
+                if (string.IsNullOrEmpty(UserName))
+                {
+                    ErrorMessage = "введите имя пользователя";
+
+                    IsError = true;
+                }
+                else
+                {
+                    if (currentUserFromDb.UserName != UserName)
+                    {
+                        currentUserFromDb.UserName = UserName;
+                    }
+
+                    await userRepository.UpdateUserAsync(currentUserFromDb);
+
+                    currentUserFromDb.Password = "";
+
+                    HttpContext.Session.SetString("currentuser", JsonConvert.SerializeObject(currentUserFromDb));
+
+                    return Redirect("/blog/adminpage/bloglist");
+                }
+            }
+
+            return Page();
+
+        }
+    }
+}
+

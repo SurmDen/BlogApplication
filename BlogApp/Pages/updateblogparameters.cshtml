@@ -1,0 +1,297 @@
+﻿@page "/blog/adminpage/update/{id}/parameters"
+@model UpdateBlogParametersModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Обновление параметров</title>
+    <link rel="stylesheet" href="~/blog/admin/updateblogparams/style.css">
+    <link rel="icon" href="~/common_imgs/icon/favicon.ico">
+</head>
+<body>
+    <section>
+        <div class="header">
+            <div class="h-menu-line">
+                <span class="admin-title">
+                    Панель администратора
+                </span>
+                <div class="settings">
+                    <a href="/blog/adminpage/user/edit"><img src="~/common_imgs/settings.png" alt=""></a>
+                    <a href="/blog/adminpage/login"><img src="~/common_imgs/logout2.png" alt=""></a>
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            <div class="side">
+                <div class="admin-short-info">
+                    <div class="admin-info-group">
+                        <img src="~/common_imgs/admin_image.png" alt="">
+                        <span>@Model.CurrentUser.UserName</span>
+                    </div>
+                </div>
+                <div class="side-bar">
+                    <a href="/blog/adminpage/bloglist" class="working-element ">Все публикации</a>
+                    <a href="/blog/adminpage/blogs/add" class="working-element">Добавить статью</a>
+                    <a href="/blog/adminpage/categories/add" class="working-element">Категории, теги</a>
+                </div>
+            </div>
+            <div class="work-part">
+                <div class="back-ref-container">
+                    <a href="/blog/adminpage/blogs/update/@Model.SelectedBlog.Id" class="back-ref">назад</a>
+                </div>
+                <form class="tag-form" asp-page="updateblogparameters" method="post">
+                    <span class="tag-title">Выберите теги для статьи</span>
+                    <div class="tag-list">
+                        @if (Model.Tags.Count > 0)
+                        {
+                            foreach (var tag in Model.Tags)
+                            {
+                                if (Model.SelectedTags.Contains(tag))
+                                {
+                                    <div class="tag-group">
+                                        <label for="@tag.Id">@tag.TagName</label>
+                                        <input checked ischecked="true" type="checkbox" class="tag checkbox" name="@tag.TagName" id="@tag.Id" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="tag-group">
+                                        <label for="@tag.Id">@tag.TagName</label>
+                                        <input ischecked="false" type="checkbox" class="tag checkbox" name="@tag.TagName" id="@tag.Id" />
+                                    </div>
+                                }
+                            }
+                        }
+                    </div>
+                    <input type="hidden" asp-for=TagListString id="tag-list-string"/>
+                    <input type="hidden" asp-for=SelectedBlogAlias value="@Model.SelectedBlog.Alias" />
+                    <input type="hidden" asp-for=IsUpdateTags value="true"/>
+                    <input type="hidden" asp-for=BlogsId value="@Model.SelectedBlog.Id" />
+                    <button type="submit" class="tag-btn">обновить</button>
+                </form>
+                <div class="video-pannel">
+                    <span class="tag-title">Работа с видео</span>
+                    <div class="add-video-pannel">
+                        <div class="switch-button-group">
+                            <button class="switch-button swiched" id="load-video">загрузить видео</button>
+                            <button class="switch-button" id="add-ref">добавить ссылку</button>
+                        </div>
+                        <form method="post" asp-page="updateblogparameters" enctype="multipart/form-data">
+                            <label class="video-label video-@Model.SelectedBlog.Id" for="video-@Model.SelectedBlog.Id">
+                                выберите видеофайл
+                            </label><br />
+                            <input asp-for="YoutubeVideoRef" class="video-youtube-input" type="text" />
+                            <input asp-for="VideoName" class="video-name-input" type="text" />
+                            <input asp-for="VideoFile" type="file" id="video-@Model.SelectedBlog.Id" class="video-input" />
+                            <input asp-for="VideoBlogAlias" type="hidden" value="@Model.SelectedBlog.Alias" />
+                            <input type="hidden" asp-for=BlogsId value="@Model.SelectedBlog.Id" />
+                            <button class="add-video-button" type="submit">загрузить</button>
+                        </form>
+
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.SelectedBlog.VideoName) && !string.IsNullOrEmpty(Model.SelectedBlog.VideoPath))
+                    {
+                        <div class="video-container">
+                            <h3 class="section-title">@Model.SelectedBlog.VideoName</h3>
+                            @* <video controls="controls">
+                                <source src="@Model.SelectedBlog.VideoPath" />
+                            </video> *@
+                            <iframe allowfullscreen src="@Model.SelectedBlog.VideoPath"></iframe>
+                            <form asp-page="updateblogparameters" method="post">
+                                <input type="hidden" asp-for="IsRemoveVideo" value="true">
+                                <input type="hidden" asp-for=SelectedBlogAlias value="@Model.SelectedBlog.Alias" />
+                                <input type="hidden" asp-for=BlogsId value="@Model.SelectedBlog.Id" />
+                                <button class="remove-video-button" type="submit">удалить</button>
+                            </form>
+                        </div>
+                    }
+                </div>
+                <div class="update-category">
+                    <span class="tag-title">Обновление категории</span>
+                    <form method="post" asp-page="updateblogparameters">
+                        <input type="hidden" asp-for="BlogsId" value="@Model.SelectedBlog.Id">
+                        <input type="hidden" asp-for="IsChangeBlogsCategory" value="true">
+                        <div class="select">
+                            <select class="format" asp-for="SelectedCatId">
+                                @if (Model.Categories.Count > 0)
+                                {
+                                    foreach (var cat in Model.Categories)
+                                    {
+                                        if (cat.Id == Model.SelectedBlog.CategoryId)
+                                        {
+                                            <option selected value="@cat.Id">@cat.CategoryName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@cat.Id">@cat.CategoryName</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <button type="submit" class="update-cat-btn">
+                            обновить
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+        </div>
+    </section>
+    <script src="~/blog/admin/updateblogparams/script.js"></script>
+</body>
+</html>
+
+@functions{
+    [Authorize(Roles = "Admin", AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+    public class UpdateBlogParametersModel : PageModel
+    {
+        private IBlogRepository blogRepository;
+
+        private IWebHostEnvironment hostEnvironment;
+
+        private ICategoryRepository categoryRepository;
+
+        public UpdateBlogParametersModel(IBlogRepository blogRepository, IWebHostEnvironment hostEnvironment, ICategoryRepository categoryRepository)
+        {
+            this.blogRepository = blogRepository;
+
+            this.hostEnvironment = hostEnvironment;
+
+            this.categoryRepository = categoryRepository;
+        }
+        public List<Category> Categories { get; set; }
+
+        [BindProperty]
+        public bool IsChangeBlogsCategory { get; set; } = false;
+
+        [BindProperty]
+        public long SelectedCatId { get; set; }
+
+        public User CurrentUser { get; set; }
+
+        public Blog SelectedBlog { get; set; }
+
+        public List<Tag> Tags { get; set; } = new List<Tag>();
+
+        public List<Tag> SelectedTags { get; set; } = new List<Tag>();
+
+        [BindProperty]
+        public IFormFile VideoFile { get; set; }
+
+        [BindProperty]
+        public bool IsRemoveVideo { get; set; }
+
+        [BindProperty]
+        public string YoutubeVideoRef { get; set; }
+
+        [BindProperty]
+        public string VideoName { get; set; }
+
+        [BindProperty]
+        public string VideoBlogAlias { get; set; }
+
+        [BindProperty]
+        public string TagListString { get; set; }
+
+        [BindProperty]
+        public string SelectedBlogAlias { get; set; }
+
+        [BindProperty]
+        public bool IsUpdateTags { get; set; }
+
+        [BindProperty]
+        public long BlogsId { get; set; }
+
+        public async Task<IActionResult> OnGetAsync(long id)
+        {
+            string? currentUserJsonString = HttpContext.Session.GetString("currentuser");
+
+            if (!string.IsNullOrEmpty(currentUserJsonString))
+            {
+                CurrentUser = JsonConvert.DeserializeObject<User>(currentUserJsonString);
+            }
+
+            SelectedBlog = await blogRepository.GetBlogByIdAsync(id);
+
+            Categories = await categoryRepository.GetSimpleCategoriesOnSpecificLanguageAsync("ru");
+
+            Tags = await blogRepository.GetSimplifiedTags();
+
+            Blog blog = await blogRepository.GetBlogAsNoTrackngAsync(id);
+
+            List<Tag>? BlogTags = blog.Tags;
+
+            if (BlogTags != null)
+            {
+                if (BlogTags.Count() > 0)
+                {
+                    foreach (var t in Tags)
+                    {
+                        foreach (var bt in BlogTags)
+                        {
+                            if (t.Id == bt.Id)
+                            {
+                                SelectedTags.Add(t);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (IsUpdateTags)
+            {
+
+                await blogRepository.UpdateTagsAsync(TagListString, SelectedBlogAlias);
+            }
+
+            if (IsChangeBlogsCategory)
+            {
+                if (BlogsId > 0 && SelectedCatId > 0)
+                {
+                    await blogRepository.UpdateBlogsCategoryAsync(BlogsId, SelectedCatId);
+                }
+            }
+
+            if (VideoFile != null && !string.IsNullOrEmpty(VideoName) && string.IsNullOrEmpty(YoutubeVideoRef))
+            {
+                string videoFormat = VideoFile.FileName;
+
+                string videoName = "video_" + Guid.NewGuid() + videoFormat;
+
+                string videoPath = $"/blog_videos/{videoName}";
+
+                string fullVideoPath = hostEnvironment.WebRootPath + videoPath;
+
+                using (FileStream fileStream = new FileStream(fullVideoPath, FileMode.Create))
+                {
+                    await VideoFile.CopyToAsync(fileStream);
+                }
+
+                await blogRepository.AddVideoToBlogsAsync(VideoBlogAlias, VideoName, videoPath);
+            }
+
+            if (VideoFile == null && !string.IsNullOrEmpty(VideoName) && !string.IsNullOrEmpty(YoutubeVideoRef))
+            {
+                string videoPath = YoutubeVideoRef;
+
+                await blogRepository.AddVideoToBlogsAsync(VideoBlogAlias, VideoName, videoPath);
+            }
+
+            if (IsRemoveVideo)
+            {
+                await blogRepository.RemoveVideoAsync(SelectedBlogAlias);
+            }
+
+            return Redirect($"/blog/adminpage/update/{BlogsId}/parameters");
+        }
+    }
+}

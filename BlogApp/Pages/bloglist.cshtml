@@ -1,0 +1,246 @@
+﻿@page "/blog/adminpage/bloglist"
+@model BlogListModel
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель администратора</title>
+    <link rel="stylesheet" href="~/blog/admin/bloglist/style.css">
+    <link rel="icon" href="~/common_imgs/icon/favicon.ico">
+</head>
+<body>
+    <div class="error-box">
+        <div class="error">
+            <div class="error-box-close">
+                <button class="error-box-close-btn">
+                    <img src="~/common_imgs/remove.png" />
+                </button>
+            </div>
+            <span class="error-message">
+                Подтвердите действие
+            </span>
+            <form asp-page="bloglist" method="post">
+                <input type="hidden" class="remove-input" asp-for="DeletedBlogAlias" value="">
+                <button type="submit" class="error-btn">ОК</button>
+            </form>
+        </div>
+    </div>
+    <section>
+        <div class="header">
+            <div class="h-menu-line">
+                <span class="admin-title">
+                    Панель администратора
+                </span>
+                <div class="settings">
+                    <a href="/blog/adminpage/user/edit"><img src="~/common_imgs/settings.png" alt=""></a>
+                    <a href="/blog/adminpage/login"><img src="~/common_imgs/logout2.png" alt=""></a>
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            <div class="side">
+                <div class="admin-short-info">
+                    <div class="admin-info-group">
+                        <img src="~/common_imgs/admin_image.png" alt="">
+                        <span>@Model.CurrentUser.UserName</span>
+                    </div>
+                </div>
+                <div class="side-bar">
+                    <a href="/blog/adminpage/bloglist" class="working-element working-element-active">Все публикации</a>
+                    <a href="/blog/adminpage/blogs/add" class="working-element">Добавить статью</a>
+                    <a href="/blog/adminpage/categories/add" class="working-element">Категории, теги</a>
+                </div>
+            </div>
+            <div class="work-part">
+                <div class="blog-list">
+                    @if (Model.BlogsOnRuLang.Count > 0)
+                    {
+                        foreach (var blog in Model.BlogsOnRuLang.Where(b => b.IsArchived == false))
+                        {
+                            <div class="blog-element">
+                                <div>
+                                    <div class="blog-element-data">
+                                        <span class="time-data">@blog.DateOfPublish.ToShortDateString()</span>
+                                        <a target="_blank" href="/blog/@blog.Category.Alias/@blog.Alias/ru" class="title-data">@blog.Title</a>
+                                    </div>
+                                    <div class="translate-tools">
+                                        @{
+                                            float percentage = Model.Blogs.Where(b => b.Alias == blog.Alias).Count() * 100 / Model.LangsCount;
+                                        }
+                                        <div class="translate-data">Процент перевода: <span>@percentage %</span></div>
+                                        @if (percentage < 100)
+                                        {
+                                            <form asp-page="bloglist" method="post">
+                                                <input type="hidden" asp-for="TranslatedBlogId" value="@blog.Id">
+                                                <button type="submit" class="translate-btn">завершить перевод</button>
+                                            </form>
+                                        }
+                                    </div>
+                                    
+                                </div>
+                                <div class="tools">
+                                    <a href="/blog/adminpage/blogs/update/@blog.Id" class="blog-edit-ref">
+                                        перейти
+                                    </a>
+                                    <button type="submit" value="@blog.Alias" class="remove-btn">удалить</button>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="archive-title">Архив</div>
+
+                        foreach (var blog in Model.BlogsOnRuLang.Where(b => b.IsArchived == true))
+                        {
+                            <div class="blog-element">
+                                <div>
+                                    <div class="blog-element-data">
+                                        <span class="time-data">@blog.DateOfPublish.ToShortDateString()</span>
+                                        <a target="_blank" href="/blog/@blog.Category.Alias/@blog.Alias/ru" class="title-data">@blog.Title</a>
+                                    </div>
+                                    <div class="translate-tools">
+                                        @{
+                                            float percentage = Model.Blogs.Where(b => b.Alias == blog.Alias).Count() * 100 / Model.LangsCount;
+                                            Console.WriteLine();
+                                        }
+                                        <div class="translate-data">Процент перевода: <span>@percentage %</span></div>
+                                        @if (percentage < 100)
+                                        {
+                                            <form asp-page="bloglist" method="post">
+                                                <input type="hidden" asp-for="TranslatedBlogId" value="@blog.Id">
+                                                <button type="submit" class="translate-btn">завершить перевод</button>
+                                            </form>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="tools">
+                                    <a href="/blog/adminpage/blogs/update/@blog.Id" class="blog-edit-ref">
+                                        перейти
+                                    </a>
+                                    <button type="submit" value="@blog.Alias" class="remove-btn">восстановить</button>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+        </div>
+    </section>
+    <script src="~/blog/admin/bloglist/script.js"></script>
+</body>
+</html>
+
+
+@functions{
+
+    [Authorize(Roles ="Admin", AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+    public class BlogListModel : PageModel
+    {
+        private IBlogRepository blogRepository;
+
+        private IUserRepository userRepository;
+
+        private ICategoryRepository categoryRepository;
+
+        public BlogListModel(IBlogRepository blogRepository, IUserRepository userRepository, ICategoryRepository categoryRepository)
+        {
+            this.blogRepository = blogRepository;
+
+            this.categoryRepository = categoryRepository;
+
+            this.userRepository = userRepository;
+        }
+
+        public User CurrentUser { get; set; }
+
+        public List<Blog> Blogs { get; set; } = new List<Blog>();
+
+        public List<Blog> BlogsOnRuLang { get; set; }
+
+        public int LangsCount { get; set; }
+
+        public List<Language> Languages { get; set; }
+
+        [BindProperty]
+        public long TranslatedBlogId { get; set; }
+
+        [BindProperty]
+        public string DeletedBlogAlias { get; set; }
+
+        [BindProperty]
+        public long SelectedBlogId { get; set; }
+
+
+        public async Task<IActionResult> OnGetAsync()
+        {
+            Blogs = await blogRepository.GetBlogsAsync();
+
+            BlogsOnRuLang = Blogs.Where(b => b.Language.LangName == "ru").ToList();
+
+            Languages = await blogRepository.GetAllLangsAsync();
+
+            LangsCount = Languages.Count();
+
+            string currentJsonUser = HttpContext.Session.GetString("currentuser");
+
+            if (!string.IsNullOrEmpty(currentJsonUser))
+            {
+                CurrentUser = JsonConvert.DeserializeObject<User>(currentJsonUser);
+            }
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            string currentJsonUser = HttpContext.Session.GetString("currentuser");
+
+
+            if (!string.IsNullOrEmpty(currentJsonUser))
+            {
+                CurrentUser = JsonConvert.DeserializeObject<User>(currentJsonUser);
+            }
+
+            if (TranslatedBlogId > 0)
+            {
+                try
+                {
+                    await blogRepository.MakeFullTranslationAsync(TranslatedBlogId);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("TRANSLATION:   " + e.Message);
+
+                    Blogs = await blogRepository.GetBlogsAsync();
+
+                    BlogsOnRuLang = Blogs.Where(b => b.Language.LangName == "ru").ToList();
+
+                    Languages = await blogRepository.GetAllLangsAsync();
+
+                    LangsCount = Languages.Count();
+
+                    return Page();
+                }
+            }
+
+            if (!string.IsNullOrEmpty(DeletedBlogAlias))
+            {
+                await blogRepository.DeleteBlogAsync(DeletedBlogAlias);
+            }
+
+            Blogs = await blogRepository.GetBlogsAsync();
+
+            BlogsOnRuLang = Blogs.Where(b => b.Language.LangName == "ru").ToList();
+
+            Languages = await blogRepository.GetAllLangsAsync();
+
+            LangsCount = Languages.Count();
+
+            return Page();
+        }
+    }
+}

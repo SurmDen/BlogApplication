@@ -1,0 +1,332 @@
+﻿@page "/blog/adminpage/categories/add"
+@model AddCategoryModel
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание категории</title>
+    <link rel="stylesheet" href="~/blog/admin/addcategory/style.css">
+    <link rel="icon" href="~/common_imgs/icon/favicon.ico">
+</head>
+<body>
+    @if (Model.IsError)
+    {
+        <div class="error-box">
+            <div class="error">
+                <span class="error-message">
+                    @Model.ErrorMessage
+                </span>
+                <button class="error-btn">
+                    ок
+                </button>
+            </div>
+        </div>
+    }
+    <section>
+        <div class="header">
+            <div class="h-menu-line">
+                <span class="admin-title">
+                    Панель администратора
+                </span>
+                <div class="settings">
+                    <a href="/blog/adminpage/user/edit"><img src="~/common_imgs/settings.png" alt=""></a>
+                    <a href="/blog/adminpage/login"><img src="~/common_imgs/logout2.png" alt=""></a>
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            <div class="side">
+                <div class="admin-short-info">
+                    <div class="admin-info-group">
+                        <img src="~/common_imgs/admin_image.png" alt="">
+                        <span>@Model.CurrentUser.UserName</span>
+                    </div>
+                </div>
+                <div class="side-bar">
+                    <a href="/blog/adminpage/bloglist" class="working-element ">Все публикации</a>
+                    <a href="/blog/adminpage/blogs/add" class="working-element">Добавить статью</a>
+                    <a href="/blog/adminpage/categories/add" class="working-element working-element-active">Категории, теги</a>
+                </div>
+            </div>
+            <div class="work-part">
+                <div tag-pannel>
+                    <div class="tag-list-pannel">
+                        <span class="tag-title">
+                            Список всех тегов
+                        </span>
+                        <div class="tag-list">
+                            @if (Model.Tags.Count() > 0)
+                            {
+                                foreach (var tag in Model.Tags)
+                                {
+                                    <a target="_blank" href="/blog/all/tag/@tag.TagName/ru" class="tag">#@tag.TagName</a>
+                                }
+                            }
+                            else
+                            {
+                                <span class="tag">тегов пока нет</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="tag-form-pannel">
+                        <div class="tag-titles-group">
+                            <span class="tag-title">
+                                Добавление тегов
+                            </span>
+                            <span class="tag-description">
+                                Отделяйте теги запятой с пробелом друг от друга при создании более одного элемента (tag1, tag2, ..., tagN)
+                            </span>
+                        </div>
+                        <form asp-page="addcategory" method="post">
+                            <input type="hidden" asp-for="IsTagList" value="true" />
+                            <input asp-for=TagList type="text" />
+                            <button type="submit" class="tag-button">добавить</button>
+                        </form>
+                    </div>
+                </div>
+                <span class="tag-title">
+                    Создание категории
+                </span>
+                <form asp-page="addcategory" class="cat-form" method="post">
+                    <input value="введите название категории" asp-for="@Model.Category.CategoryName" type="text">
+                    <button>создать</button>
+                </form>
+
+                <div class="category-part">
+                    <div class="cat-title">
+                        Список категорий
+                    </div>
+                    <div class="category-list">
+                        @foreach (Category category in Model.AllCategories)
+                        {
+                            <form asp-page="addcategory" method="post">
+                                <input type="hidden" asp-for="SelectedCategoryAlias" value="@category.Alias">
+                                <input asp-for="CategoryName" value="@category.CategoryName" class="cat-update-input">
+                                <button type="submit" class="cat-update-button">обновить</button>
+                                <a target="_blank" class="cat-demo-ref" href="/blog/all/@category.Alias/ru">/blogs/@category.Alias/ru</a>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+        </div>
+    </section>
+    <script src="~/blog/admin/addcategory/script.js"></script>
+</body>
+</html>
+
+
+
+@functions{
+    [Authorize(Roles = "Admin", AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+    public class AddCategoryModel : PageModel
+    {
+        private ICategoryRepository categoryRepository;
+
+        private IBlogRepository blogRepository;
+
+        public AddCategoryModel(ICategoryRepository categoryRepository, IBlogRepository blogRepository)
+        {
+            this.categoryRepository = categoryRepository;
+
+            this.blogRepository = blogRepository;
+        }
+
+        [BindProperty]
+        public Category Category { get; set; } = new Category();
+
+        [BindProperty]
+        public string SelectedCategoryAlias { get; set; }
+
+        [BindProperty]
+        public string CategoryName { get; set; }
+
+        public List<Category> AllCategories { get; set; }
+
+        [BindProperty]
+        public bool IsError { get; set; } = false;
+
+        [BindProperty]
+        public string ErrorMessage { get; set; }
+
+        public List<Tag> Tags { get; set; } = new List<Tag>();
+
+        [BindProperty]
+        public string TagList { get; set; }
+
+        [BindProperty]
+        public bool IsTagList { get; set; }
+
+        public User CurrentUser { get; set; }
+
+        public async Task<IActionResult> OnGetAsync()
+        {
+            AllCategories = await categoryRepository.GetSimpleCategoriesOnSpecificLanguageAsync("ru");
+
+            string? currentUserJsonString = HttpContext.Session.GetString("currentuser");
+
+            Tags = await blogRepository.GetSimplifiedTags();
+
+            if (!string.IsNullOrEmpty(currentUserJsonString))
+            {
+                CurrentUser = JsonConvert.DeserializeObject<User>(currentUserJsonString);
+            }
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            string? currentUserJsonString = HttpContext.Session.GetString("currentuser");
+
+            if (!string.IsNullOrEmpty(currentUserJsonString))
+            {
+                CurrentUser = JsonConvert.DeserializeObject<User>(currentUserJsonString);
+            }
+
+            if (!string.IsNullOrEmpty(SelectedCategoryAlias) && !string.IsNullOrEmpty(CategoryName))
+            {
+                Console.WriteLine("update run");
+
+                Category catFromDb = await categoryRepository.GetCategoryByAliasAndLanguageAsync(SelectedCategoryAlias, "ru");
+
+                if (CategoryName.ToLower() == catFromDb.CategoryName.ToLower())
+                {
+                    IsError = true;
+
+                    ErrorMessage = "Название категории не изменилось";
+
+                    Console.WriteLine("update run 1");
+
+                    AllCategories = await categoryRepository.GetSimpleCategoriesOnSpecificLanguageAsync("ru");
+
+                    Tags = await blogRepository.GetSimplifiedTags();
+
+                    return Page();
+                }
+                else
+                {
+                    try
+                    {
+                        Console.WriteLine("update run 2");
+
+                        catFromDb.CategoryName = CategoryName;
+
+                        await categoryRepository.UpdateCategoryAsync(catFromDb);
+
+                        IsError = true;
+
+                        ErrorMessage = "Перевод категории успешно обновлен";
+
+                        AllCategories = await categoryRepository.GetSimpleCategoriesOnSpecificLanguageAsync("ru");
+
+                        Tags = await blogRepository.GetSimplifiedTags();
+
+                        return Page();
+                    }
+                    catch (Exception)
+                    {
+                        IsError = true;
+
+                        ErrorMessage = "При обновлении категории произошла ошибка";
+
+                        AllCategories = await categoryRepository.GetSimpleCategoriesOnSpecificLanguageAsync("ru");
+
+                        Tags = await blogRepository.GetSimplifiedTags();
+
+                        return Page();
+                    }
+                }
+            }
+
+            if (!string.IsNullOrEmpty(Category.CategoryName) )
+            {
+                List<Category> categories = await categoryRepository.GetSimpleCategoriesOnSpecificLanguageAsync("ru");
+
+                foreach (var cat in categories)
+                {
+                    if (cat.CategoryName.ToLower() == Category.CategoryName.ToLower())
+                    {
+                        IsError = true;
+
+                        ErrorMessage = "Категория с таким названием уже существует";
+
+                        AllCategories = await categoryRepository.GetSimpleCategoriesOnSpecificLanguageAsync("ru");
+
+                        Tags = await blogRepository.GetSimplifiedTags();
+
+                        return Page();
+                    }
+                }
+
+                try
+                {
+                    await categoryRepository.CreateCategoryAsync(Category);
+
+                    IsError = true;
+
+                    ErrorMessage = "Категория успешно создана";
+
+                    AllCategories = await categoryRepository.GetSimpleCategoriesOnSpecificLanguageAsync("ru");
+
+                    Tags = await blogRepository.GetSimplifiedTags();
+
+                    return Page();
+                }
+                catch
+                {
+                    IsError = true;
+
+                    ErrorMessage = "Не удалось создать категорию";
+
+                    AllCategories = await categoryRepository.GetSimpleCategoriesOnSpecificLanguageAsync("ru");
+
+                    Tags = await blogRepository.GetSimplifiedTags();
+
+                    return Page();
+                }
+            }
+
+            if (IsTagList)
+            {
+                if (!string.IsNullOrEmpty(TagList))
+                {
+                    List<Tag> tags = new List<Tag>();
+
+                    if (TagList.Contains(','))
+                    {
+                        string[] taglist = TagList.Split(", ");
+
+                        foreach (string tag in taglist)
+                        {
+                            tags.Add(new Tag() { TagName = tag });
+                        }
+                    }
+                    else
+                    {
+                        tags.Add(new Tag() { TagName = TagList });
+                    }
+
+                    await blogRepository.CreateTagsAsync(tags);
+
+                    IsError = true;
+
+                    ErrorMessage = "Теги успешно созданы";
+
+                    AllCategories = await categoryRepository.GetSimpleCategoriesOnSpecificLanguageAsync("ru");
+
+                    Tags = await blogRepository.GetSimplifiedTags();
+
+                    return Page();
+                }
+            }
+
+            return Page();
+        }
+    }
+}

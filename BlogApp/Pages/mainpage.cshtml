@@ -1,0 +1,307 @@
+﻿@page "/blog/main/{lang}"
+@model MainPageModel
+
+<!DOCTYPE html>
+<html lang="@Model.SelectedLangCode" prefix="og: http://ogp.me/ns#">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Model.SelectedTitle.HeadTitle bot-market</title>
+    <meta name="description" content="@Model.SelectedTitle.DescriptionTitle" />
+    <meta name="keywords" content="bot-market, bot, telegram, bot creating, blog about telegram bots, telegram bot's shop"/>
+    <meta name="robots" content="all"/>
+    <link rel="stylesheet" href="~/blog/style.css">
+    <link rel="icon" href="~/common_imgs/icon/favicon.ico">
+    <link rel="canonical" href="https://bot-market.com/blog/main/@Model.SelectedLangCode"/>
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@Html.Raw("@")-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@Html.Raw("@")-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@Html.Raw("@")-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@Html.Raw("@")-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@Html.Raw("@")keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+    <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script type="application/ld+json">
+        {
+        "@Html.Raw("@")context": "http://schema.org",
+        "@Html.Raw("@")type": "Blog",
+        "headline": "@(Model.SelectedTitle.HeadTitle + " BOT-MARKET")",
+        "image": "https://bot-market.com/common_imgs/bot.png",
+        "description":"@Model.SelectedTitle.DescriptionTitle",
+        "url":"https://bot-market.com/blog/main/@Model.SelectedLangCode"
+        }
+    </script>
+    <meta property="og:url" content="https://bot-market.com/blog/main/@Model.SelectedLangCode" />
+    <meta property="og:image" content="https://bot-market.com/common_imgs/bot.png"/>
+    <meta property="og:site_name" content="@Model.SelectedTitle.HeadTitle BOT-MARKET"/>
+    <meta property="og:description" content="@Model.SelectedTitle.DescriptionTitle"/>
+</head>
+<body>
+    <div class="tag-search-pannel">
+        <div class="close-tag-pannel">
+            <button>
+                <img src="~/common_imgs/remove.png"/>
+            </button>
+        </div>
+        <form method="post" asp-page="mainpage">
+            <div class="tag-list">
+                @foreach (var tag in Model.Tags)
+                {
+                    if (tag.Blogs.Count > 0)
+                    {
+                        <label id="@tag.Id" class="tag">
+                            #@tag.TagName
+                        </label>
+                    }
+                }
+            </div>
+            <input type="hidden" asp-for=TagIdsString value="" class="tag-input"/>
+            <button type="submit" class="tag-post-btn">OK</button>
+        </form>
+    </div>
+    <section>
+        <div class="header">
+            <div class="lang-block">
+                <div class="login-block">
+                    <a class="login-ref" href="/blog/authpage/login?redirect=@Model.HttpContext.Request.Path">
+                        Sign In
+                    </a>
+                    <div class="user-block">
+                        <span class="user-name">@Model.CurrentUser.UserName</span>
+                    </div>
+                </div>
+                <form asp-page="mainpage" method="post">
+                    <select asp-for="SelectedLangCode" class="lang-select">
+                        @foreach (var lang in Model.Languages)
+                        {
+                            @if (lang.LangName == HttpContext.Session.GetString("lang"))
+                            {
+                                <option selected="selected" value="@lang.LangName">@lang.FullLangName</option>
+                            }
+                            else
+                            {
+                                <option value="@lang.LangName">@lang.FullLangName</option>
+                            }
+                        }
+                    </select>
+                    <button type="submit" class="translate-btn">ok</button>
+                </form>
+            </div>
+            <div class="author-short-data" dir=@(Model.SelectedLangCode == "ar" ? "rtl" : "")>
+                <span class="s-title">
+                    <span>@Model.SelectedTitle.HeadTitle</span>
+                    <img class="title-logo-img" src="~/common_imgs/title_logo.png"/>
+                </span>
+                <span class="s-description">
+                    @Model.SelectedTitle.DescriptionTitle
+                </span>
+            </div>
+            <div class="h-menu-line" dir=@(Model.SelectedLangCode == "ar" ? "rtl" : "")>
+                <a href="https://bot-market.com/" class="menu-active">@Model.SelectedTitle.MainRef</a>
+                <a href="/blog/all/@Model.SelectedLangCode">@Model.SelectedTitle.BlogsRef</a>
+            </div>
+        </div>
+        <div class="main" dir=@(Model.SelectedLangCode == "ar" ? "rtl" : "")>
+            <div class="blog-part">
+                <div class="blog-list">
+                    @if (Model.Blogs.Count() > 0)
+                    {
+                        foreach (var blog in Model.Blogs.Where(b =>b.IsArchived == false))
+                        {
+                            <a href="/blog/@blog.Category.Alias/@blog.Alias/@HttpContext.Session.GetString("lang")" class="blog-group">
+                                <div class="blog-img-container">
+                                    @if (!string.IsNullOrEmpty(blog.Image))
+                                    {
+                                        <amp-img width="auto" height=150px media="(min-width: 300px)" layout="fixed-height" position="absolute" left=0 top=0; src="@blog.Image" alt="@blog.Title"></amp-img>
+                                    }
+                                    else
+                                    {
+                                        <amp-img width="auto" height=150px media="(min-width: 300px)" layout="fixed-height" position="absolute" left=0 top=0; src="/common_imgs/bot.png" alt="@blog.Title"></amp-img>
+                                    }
+                                </div>
+                                <div class="blog-title">
+                                    @blog.Title
+                                </div>
+                            </a>
+                        }
+                    }
+                </div>
+            </div>
+            <div class="side-bar">
+                <div class="search-group">
+                    <div class="gcse-search"></div>
+
+                    @if (Model.Tags.Count > 0)
+                    {
+                        <button class="tag-search-btn">tag search</button>
+                    }
+                </div>
+
+                <div class="rubrics">
+                    <span class="r-title">
+                        @Model.SelectedTitle.CatTitle
+                    </span>
+                    <div class="cat-list">
+                        @if (Model.Categories.Count() > 0)
+                        {
+                            foreach (var cat in Model.Categories)
+                            {
+                                <div class="cat-group">
+                                    @if (Model.SelectedLangCode != "ar")
+                                    {
+                                        <img src="~/blog/images/arrow.png" class="rubric-img" alt="">
+                                    }
+                                    <a href="/blog/all/@cat.Alias/@HttpContext.Session.GetString("lang")" class="cat-element">@cat.CategoryName</a>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer" dir=@(Model.SelectedLangCode == "ar" ? "rtl" : "")>
+            <span class="f-title">© @DateTime.Now.Year.ToString() @Model.SelectedTitle.HeadTitle bot-matket</span>
+            <span class="f-desc">@Model.SelectedTitle.WarningInfo</span>
+            <div class="link-container">
+                <a href="#" class="link-ref">
+                    <img src="~/common_imgs/icons8-instagram-96.png"/>
+                </a>
+                <a href="#" class="link-ref">
+                    <img src="~/common_imgs/icons8-telegram-96.png"/>
+                </a>
+                <a href="#" class="link-ref">
+                    <img src="~/common_imgs/icons8-youtube-96.png"/>
+                </a>
+            </div>
+        </div>
+    </section>
+    <script src="~/blog/script.js"></script>
+</body>
+</html>
+
+@functions{
+    public class MainPageModel : PageModel
+    {
+        private IBlogRepository blogRepository;
+
+        private ICategoryRepository categoryRepository;
+
+        public MainPageModel(IBlogRepository blogRepository, ICategoryRepository categoryRepository)
+        {
+            this.blogRepository = blogRepository;
+
+            this.categoryRepository = categoryRepository;
+        }
+
+        public List<Tag> Tags { get; set; } = new List<Tag>();
+
+        public List<Blog> Blogs { get; set; } = new List<Blog>();
+
+        public List<Category> Categories { get; set; } = new List<Category>();
+
+        public List<Language> Languages { get; set; } = new List<Language>();
+
+        [BindProperty]
+        public string SearchedBlogSubString { get; set; }
+
+        [BindProperty]
+        public int CurrentPage { get; set; }
+
+        [BindProperty]
+        public bool IsPaginator { get; set; }
+
+        public int TotalPages { get; set; }
+
+        public int ItemsInPage { get; set; } = 10;
+
+        [BindProperty]
+        public string SelectedLangCode { get; set; }
+
+        public Title SelectedTitle { get; set; }
+
+        public BotUserShortData CurrentUser { get; set; } = new BotUserShortData();
+
+        [BindProperty]
+        public string TagIdsString { get; set; }
+
+        public async Task<IActionResult> OnGetAsync(string lang)
+        {
+            string? botUserJsonString = HttpContext.Session.GetString("current_bot_user");
+
+            if (!string.IsNullOrEmpty(botUserJsonString))
+            {
+                CurrentUser = JsonConvert.DeserializeObject<BotUserShortData>(botUserJsonString);
+            }
+
+            string currentLang = lang; //HttpContext.Session.GetString("lang");
+
+            SelectedLangCode = currentLang;
+
+            HttpContext.Session.SetString("lang", lang);
+
+            Blogs = await blogRepository.GetBlogsOnSpecificLanguageAsync(currentLang);
+
+            Categories = await categoryRepository.GetCategoriesOnSpecificLanguageAsync(currentLang);
+
+            SelectedTitle = await blogRepository.GetTitleByLangCodeAsync(currentLang);
+
+            Languages = await blogRepository.GetAllLangsAsync();
+
+            Tags = await blogRepository.GetSimplifiedTags();
+
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (!string.IsNullOrEmpty(SelectedLangCode))
+            {
+                HttpContext.Session.SetString("lang", SelectedLangCode);
+
+                return Redirect($"/blog/main/{SelectedLangCode}");
+            }
+
+            SelectedLangCode = HttpContext.Session.GetString("lang");
+
+            Blogs = await blogRepository.GetBlogsOnSpecificLanguageAsync(SelectedLangCode);
+
+            if (!string.IsNullOrEmpty(TagIdsString))
+            {
+                string[] tagsId = TagIdsString.Split(",");
+
+                List<Tag> tags = new List<Tag>();
+
+                foreach (var b in Blogs)
+                {
+                    if (b.Tags != null)
+                    {
+                        if (b.Tags.Count() > 0)
+                        {
+                            tags.AddRange(b.Tags);
+                        }
+                    }
+                }
+
+                foreach (string id in tagsId)
+                {
+                    Int64 tagId = Int64.Parse(id);
+
+                    Tag tag = tags.First(t => t.Id == tagId);
+
+                    Blogs = Blogs.Where(b => b.Tags.Contains(tag)).ToList();
+                }
+            }
+
+            Categories = await categoryRepository.GetCategoriesOnSpecificLanguageAsync(SelectedLangCode);
+
+            Languages = await blogRepository.GetAllLangsAsync();
+
+            SelectedTitle = await blogRepository.GetTitleByLangCodeAsync(SelectedLangCode);
+
+            Tags = await blogRepository.GetSimplifiedTags();
+
+            if (!string.IsNullOrEmpty(SearchedBlogSubString))
+            {
+                Blogs = Blogs.Where(b => b.Title.ToLower().Contains(SearchedBlogSubString.ToLower())).ToList();
+
+                SearchedBlogSubString = string.Empty;
+            }
+
+            return Page();
+        }
+    }
+}

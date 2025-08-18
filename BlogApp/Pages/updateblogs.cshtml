@@ -1,0 +1,154 @@
+﻿@page "/blog/adminpage/blogs/update/{id}"
+@model UpdateBlogModel
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@Model.SelectedBlog.Title</title>
+    <link rel="stylesheet" href="~/blog/admin/updateblog/style.css">
+    <link rel="stylesheet" href="~/blog/admin/updateblog/specific/style.css">
+    <link rel="icon" href="~/common_imgs/icon/favicon.ico">
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+</head>
+<body>
+    <div class="load-box">
+        <span class="loader"></span>
+    </div>
+    <div class="error-box">
+        <div class="error">
+            <span class="error-message">
+                
+            </span>
+            <button class="error-btn">
+                ок
+            </button>
+        </div>
+    </div>
+    <input type="hidden" value="@Model.SelectedBlog.Id" class="user-id">
+    <section>
+        <div class="header">
+            <div class="h-menu-line">
+                <span class="admin-title">
+                    Панель администратора
+                </span>
+                <div class="settings">
+                    <a href="/blog/adminpage/user/edit"><img src="~/common_imgs/settings.png" alt=""></a>
+                    <a href="/blog/adminpage/login"><img src="~/common_imgs/logout2.png" alt=""></a>
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            <div class="side">
+                <div class="admin-short-info">
+                    <div class="admin-info-group">
+                        <img src="~/common_imgs/admin_image.png" alt="">
+                        <span>@Model.CurrentUser.UserName</span>
+                    </div>
+                </div>
+                <div class="side-bar">
+                    <a href="/blog/adminpage/bloglist" class="working-element ">Все публикации</a>
+                    <a href="/blog/adminpage/blogs/add" class="working-element">Добавить статью</a>
+                    <a href="/blog/adminpage/categories/add" class="working-element">Категории, теги</a>
+                </div>
+            </div>
+            <div class="work-part">
+                <div class="translate-refs-block">
+                    <h5 class="refs-title">Индивидуальное обновление</h5>
+                    <div class="translate-refs-list">
+                        @foreach (Language lang in Model.Languages)
+                        {
+                            <a href="/blog/adminpage/update/@Model.SelectedBlog.Alias/@lang.LangName" class="translate-ref">
+                                @lang.LangName
+                            </a>
+                        }
+                    </div>
+                </div>
+                <div class="special-edit-ref-container">
+                    <a class="special-edit-ref" href="/blog/adminpage/update/@Model.SelectedBlog.Id/parameters">
+                        Обновление специальных параметров
+                    </a>
+                </div>
+                <form class="blog-form" enctype="multipart/form-data">
+                    <div class="pub-btn-container">
+                        <button class="publish-btn">
+                            обновить
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="footer">
+        </div>
+    </section>
+    <script src="~/blog/admin/updateblog/script.js"></script>
+</body>
+</html>
+
+
+@functions{
+    [Authorize(Roles = "Admin", AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+    public class UpdateBlogModel : PageModel
+    {
+        private IUserRepository userRepository;
+        private IBlogRepository blogRepository;
+
+        public UpdateBlogModel(IUserRepository userRepository, IBlogRepository blogRepository)
+        {
+            this.userRepository = userRepository;
+            this.blogRepository = blogRepository;
+        }
+
+        public User CurrentUser { get; set; }
+
+        public Blog SelectedBlog { get; set; }
+
+        public List<Language> Languages { get; set; }
+
+        public List<Tag> Tags { get; set; } = new List<Tag>();
+
+        public List<Tag> SelectedTags { get; set; } = new List<Tag>();
+
+        public async Task<IActionResult> OnGetAsync(long id)
+        {
+            string currentJsonUser = HttpContext.Session.GetString("currentuser");
+
+            if (!string.IsNullOrEmpty(currentJsonUser))
+            {
+                CurrentUser = JsonConvert.DeserializeObject<User>(currentJsonUser);
+            }
+
+            Languages = await blogRepository.GetAllLangsAsync();
+
+            SelectedBlog = await blogRepository.GetBlogByIdAsync(id);
+
+            Tags = await blogRepository.GetSimplifiedTags();
+
+            Blog blog = await blogRepository.GetBlogAsNoTrackngAsync(id);
+
+            List<Tag>? BlogTags = blog.Tags;
+
+            if (BlogTags != null)
+            {
+                if (BlogTags.Count() > 0)
+                {
+                    foreach (var t in Tags)
+                    {
+                        foreach (var bt in BlogTags)
+                        {
+                            if (t.Id == bt.Id)
+                            {
+                                SelectedTags.Add(t);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return Page();
+        }
+    }
+}

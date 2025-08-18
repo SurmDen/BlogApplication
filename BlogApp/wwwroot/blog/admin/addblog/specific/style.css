@@ -1,0 +1,349 @@
+
+.blog-form {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    margin-top: 70px;
+}
+
+.pub-btn-container{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.publish-btn{
+    width: fit-content;
+    font-size: 18px;
+    background-color: rgb(31, 122, 201);
+    color: white;
+    border: none;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    padding: 8px 15px;
+}
+
+input:focus{
+    box-shadow: 0 0 10px rgb(49, 44, 44);
+}
+
+textarea:focus{
+    box-shadow: 0 0 10px rgb(49, 44, 44);
+}
+
+button{
+    cursor: pointer;
+    font-family:Arial, Helvetica, sans-serif
+}
+
+.blog-group{
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 15px;
+}
+
+.add-block{
+    margin-top: 30px;
+}
+
+.add-block button{
+    outline: none;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgb(40, 40, 52);
+    color: white;
+    border-radius: 5px;
+    padding: 7px 12px;
+    border: none;
+}
+
+.section-group{
+    margin-top: 40px;
+    border: 2px solid rgb(31, 122, 201);
+    border-radius: 7px;
+    padding: 15px;
+    position: relative;
+}
+
+.section-group button{
+    margin-left: 15px;
+}
+
+.subsection-group{
+    margin-top: 40px;
+    margin-left: 15px;
+    border: 2px solid rgb(31, 122, 201);
+    border-radius: 7px;
+    padding: 15px;
+    position: relative;
+}
+
+.subsection-group button{
+    margin-left: 15px;
+}
+
+.paragraph-group{
+    margin-top: 40px;
+    margin-left: 15px;
+    border: 2px solid rgb(31, 122, 201);
+    border-radius: 7px;
+    padding: 15px;
+    position: relative;
+}
+
+.input-group{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.input-group input{
+    outline: none;
+    padding: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    margin-top: 7px;
+}
+
+.input-group label{
+    font-size: 18px;
+}
+
+.area-group{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.area-group textarea{
+    outline: none;
+    padding: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    margin-top: 7px;
+    min-height: 80px;
+    min-width: 99%;
+    max-width: 99%;
+    width: auto;
+}
+
+.area-group label{
+    font-size: 18px;
+}
+
+.img-group{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.img-group input{
+    display: none;
+}
+
+.img-group label img{
+    width: 60px;
+    height: auto;
+}
+
+.img-group label{
+    width: fit-content;
+}
+
+.image-preview{
+    width: 60px;
+    height: auto;
+}
+
+.image-preview-block{
+    margin-left: 10px;
+    width: fit-content;
+}
+
+.remove-btn{
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    outline: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 3px;
+    border: 2px solid black;
+    border-radius: 5px;
+    background: none;
+}
+
+.remove-btn:hover{
+    background-color: rgb(245, 24, 24);
+}
+
+.remove-btn img{
+    width: 20px;
+    height: auto;
+}
+
+
+
+
+.load-box{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    justify-content: center;
+    z-index: 10;
+    align-items: center;
+    position: fixed;
+    background: rgba(44, 46, 49, 0.3);
+    display: none;
+}
+
+.loader {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 6rem;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+  }
+  .loader:before,
+  .loader:after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    animation: pulsOut 1.8s ease-in-out infinite;
+    filter: drop-shadow(0 0 1rem rgba(255, 255, 255, 0.75));
+  }
+  .loader:before {
+    width: 100%;
+    padding-bottom: 100%;
+    box-shadow: inset 0 0 0 1rem #fff;
+    animation-name: pulsIn;
+  }
+  .loader:after {
+    width: calc(100% - 2rem);
+    padding-bottom: calc(100% - 2rem);
+    box-shadow: 0 0 0 0 #fff;
+  }
+
+  @keyframes pulsIn {
+    0% {
+      box-shadow: inset 0 0 0 1rem #fff;
+      opacity: 1;
+    }
+    50%, 100% {
+      box-shadow: inset 0 0 0 0 #fff;
+      opacity: 0;
+    }
+  }
+
+  @keyframes pulsOut {
+    0%, 50% {
+      box-shadow: 0 0 0 0 #fff;
+      opacity: 0;
+    }
+    100% {
+      box-shadow: 0 0 0 1rem #fff;
+      opacity: 1;
+    }
+  }
+
+
+
+  .error-box{
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    justify-content: center;
+    z-index: 10;
+    align-items: flex-start;
+    padding-top: 30px;
+    position: fixed;
+    background: rgba(44, 46, 49, 0.3);
+    display: none;
+  }
+
+  .error{
+    width: 300px;
+    background-color: white;
+    padding: 15px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+
+  .error-message{
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .error-btn{
+    background-color: orange;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 7px  15px;
+    text-align: center;
+    font-size: 18px;
+  }
+
+
+
+
+  select {
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    -ms-appearance:none;
+    appearance:none;
+    outline:0;
+    box-shadow:none;
+    border:0!important;
+    background: #5c6664;
+    background-image: none;
+    flex: 1;
+    padding: 0 .5em;
+    color:#fff;
+    cursor:pointer;
+    font-size: 1em;
+    font-family: 'Open Sans', sans-serif;
+ }
+ select::-ms-expand {
+    display: none;
+ }
+ .select {
+    position: relative;
+    display: flex;
+    width: 20em;
+    height: 3em;
+    line-height: 3;
+    background: #5c6664;
+    overflow: hidden;
+    border-radius: .25em;
+    margin-bottom: 50px;
+ }
+ .select::after {
+    content: '\25BC';
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0 1em;
+    background: #2b2e2e;
+    cursor:pointer;
+    pointer-events:none;
+    transition:.25s all ease;
+ }
+ .select:hover::after {
+    color: #23b499;
+ }
