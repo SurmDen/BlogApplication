@@ -16,7 +16,9 @@ namespace BlogApp.Infrastructure
             {
                 XElement urlElement = new XElement(
                     xmlns + "url",
-                    new XElement(xmlns + "loc", sitemapNode));
+                    new XElement(xmlns + "loc", sitemapNode),
+                    new XElement(xmlns + "isMultilanguage", "true"),
+                    new XElement(xmlns + "lastmod", DateTime.Today.ToString("yyyy-MM-dd")));
 
                 root.Add(urlElement);
             }

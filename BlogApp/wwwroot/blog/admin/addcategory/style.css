@@ -145,7 +145,7 @@ section{
 
 .admin-short-info{
     height: 100px;
-    background-image: url(../../common_imgs/admin-fone.jpg);
+    background-image: url(/common_imgs/admin-fone.jpg);
     background-repeat: no-repeat;
     background-position: center center;
     -webkit-background-size: cover;
