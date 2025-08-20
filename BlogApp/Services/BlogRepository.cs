@@ -50,52 +50,16 @@ namespace BlogApp.Services
             try
             {
                 var blogOnRuLang = await _blogContext.Blogs
-                    .AsNoTracking()
                     .Include(b => b.Tags)
                     .Include(b => b.User)
                     .Include(b => b.Sections)
                         .ThenInclude(s => s.Subsections)
                             .ThenInclude(s => s.Paragraphs)
-                    .AsSplitQuery()
                     .FirstOrDefaultAsync(b => b.Id == ruBlogId);
 
                 if (blogOnRuLang == null)
                 {
                     throw new ArgumentException($"Блог с ID {ruBlogId} не найден");
-                }
-
-                blogOnRuLang.User.Blogs = null;
-
-                if (blogOnRuLang.Tags != null)
-                {
-                    foreach (var tag in blogOnRuLang.Tags)
-                    {
-                        tag.Blogs = null;
-                    }
-                }
-
-                if (blogOnRuLang.Sections != null)
-                {
-                    foreach (var section in blogOnRuLang.Sections)
-                    {
-                        section.Blog = null;
-
-                        if (section.Subsections != null)
-                        {
-                            foreach (var subsection in section.Subsections)
-                            {
-                                subsection.Section = null;
-
-                                if (subsection.Paragraphs != null)
-                                {
-                                    foreach (var paragraph in subsection.Paragraphs)
-                                    {
-                                        paragraph.Subsection = null;
-                                    }
-                                }
-                            }
-                        }
-                    }
                 }
 
                 var existingLanguageIds = await _blogContext.Blogs

@@ -6,9 +6,6 @@ using BlogApp.Data;
 using BlogApp.Interfaces;
 using BlogApp.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Concurrent;
-using System.Transactions;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace BlogApp.Services
 {
@@ -33,6 +30,8 @@ namespace BlogApp.Services
         private readonly string baseURL = string.Empty;
         private readonly string folderID = string.Empty;
         private readonly string apiKey = string.Empty;
+
+        private readonly string keyWord = "hello world";
 
         public async Task TranslateVideoNameAsync(string blogAlias, string vName, string vPath)
         {
@@ -71,6 +70,7 @@ namespace BlogApp.Services
 
             Category selectedCategory = categories.First(c => c.Id == blog.CategoryId);
 
+
             try
             {
                 object locker = new object();
@@ -82,8 +82,12 @@ namespace BlogApp.Services
                     CancellationToken = cts.Token
                 };
 
-                Parallel.ForEach(languages.Where(l => l.LangName != "ka" && l.LangName != "ko"), parallelOptions, (Language lan) =>
+                Parallel.ForEach(languages, 
+                    parallelOptions, 
+                    (Language lan) =>
                 {
+                    BlogContext taskContext = serviceProvider.GetRequiredService<BlogContext>();
+
                     try
                     {
                         Blog translatedBlog = new Blog();
@@ -98,7 +102,7 @@ namespace BlogApp.Services
                         }
                         catch (Exception e)
                         {
-                            throw new Exception("Ошибка перевода", e);
+                            throw new Exception($"Ошибка перевода title {lan.LangName} {e.Message}", e);
 
                         }
 
@@ -107,12 +111,12 @@ namespace BlogApp.Services
                         try
                         {
                             translatedBlog.Description = string.IsNullOrEmpty(blog.Description) ? "" :
-                                TranslateAsync(blog.Description, lan.LangName).Result.text;
+                               TranslateAsync(blog.Description, lan.LangName).Result.text;
 
                         }
                         catch (Exception e)
                         {
-                            throw new Exception("Ошибка перевода", e);
+                            throw new Exception($"Ошибка перевода descr {lan.LangName} {e.Message}", e);
                         }
 
                         translatedBlog.UserId = blog.UserId;
@@ -126,14 +130,6 @@ namespace BlogApp.Services
                         translatedBlog.CategoryId = categories.
                             First(c => c.Alias == selectedCategory.Alias && c.LanguageId == lan.Id).Id;
 
-                        //if (blog.Tags != null)
-                        //{
-                        //    if (blog.Tags.Count() > 0)
-                        //    {
-                        //        translatedBlog.Tags = blog.Tags;
-                        //    }
-                        //}
-
                         foreach (Section section in blog.Sections)
                         {
                             if (translatedBlog.Sections == null)
@@ -146,11 +142,11 @@ namespace BlogApp.Services
                             try
                             {
                                 translatedSection.Title = string.IsNullOrEmpty(section.Title) ? "" :
-                                TranslateAsync(section.Title, lan.LangName).Result.text;
+                                    TranslateAsync(section.Title, lan.LangName).Result.text;
                             }
                             catch (Exception e)
                             {
-                                throw new Exception("Ошибка перевода", e);
+                                throw new Exception($"Ошибка перевода section {lan.LangName} {e.Message}", e);
                             }
 
                             translatedBlog.Sections.Add(translatedSection);
@@ -171,7 +167,7 @@ namespace BlogApp.Services
                                 }
                                 catch (Exception e)
                                 {
-                                    throw new Exception("Ошибка перевода", e);
+                                    throw new Exception($"Ошибка перевода subsection {lan.LangName} {e.Message}", e);
                                 }
 
                                 translatedSection.Subsections.Add(translatedSub);
@@ -191,11 +187,11 @@ namespace BlogApp.Services
                                     try
                                     {
                                         translatedPar.Text = string.IsNullOrEmpty(par.Text) ? "" :
-                                        TranslateAsync(par.Text, lan.LangName).Result.text;
+                                            TranslateAsync(par.Text, lan.LangName).Result.text;
                                     }
                                     catch (Exception e)
                                     {
-                                        throw new Exception("Ошибка перевода", e);
+                                        throw new Exception($"Ошибка перевода paragraph {lan.LangName} {e.Message}", e);
                                     }
 
                                     translatedSub.Paragraphs.Add(translatedPar);
@@ -203,13 +199,23 @@ namespace BlogApp.Services
                             }
                         }
 
-                        lock(locker){
-                            blogContext.Blogs.Add(translatedBlog);
+                        lock (locker)
+                        {
+                            Blog currentTaskBlog = taskContext.Blogs.Include(b => b.Tags).First(b => b.Id == blog.Id);
+
+                            if (currentTaskBlog.Tags != null)
+                            {
+                                translatedBlog.Tags = currentTaskBlog.Tags;
+                            }
+
+                            taskContext.Blogs.Add(translatedBlog);
+
+                            taskContext.SaveChanges();
                         }
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        //cts.Cancel();
+                        Console.WriteLine(e.Message);
                     }
                 });
             }
@@ -220,7 +226,7 @@ namespace BlogApp.Services
                 throw new Exception("Перевод статьи аварийно завершен", e);
             }
 
-            await blogContext.SaveChangesAsync();
+            //await blogContext.SaveChangesAsync();
         }
 
         public async Task TranslateNewBlogAsync(Blog blog)
@@ -919,7 +925,7 @@ namespace BlogApp.Services
             TranslatedCategories.Add(category);
 
             foreach (Language language in languages.
-                Where(l => l.Id != detectedLanguage.Id && l.LangName != "ka" && l.LangName != "ko"))
+                Where(l => l.Id != detectedLanguage.Id && l.LangName != "ka" && l.LangName != "ko" && l.LangName != "ar"))
             {
                 Category translatedCategory = new Category()
                 {
@@ -986,12 +992,10 @@ namespace BlogApp.Services
 
         Semaphore semaphore = new Semaphore(19,19);
 
+        private HttpClient client = new HttpClient();
+
         public async Task<Translation> TranslateAsync(string text, string langCode)
         {
-
-            HttpClient client = new HttpClient();
-
-            client.Timeout = TimeSpan.FromMinutes(1);
 
             using StringContent jsonContent = new StringContent(
                     JsonConvert.SerializeObject(new
@@ -1020,7 +1024,7 @@ namespace BlogApp.Services
             
             response = client.Send(request);
 
-            Thread.Sleep(1000);
+            Thread.Sleep(1010);
             
             semaphore.Release();
 
