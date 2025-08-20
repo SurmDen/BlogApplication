@@ -15,6 +15,10 @@
     <link rel="stylesheet" href="~/comments/style.css"/>
     <link rel="icon" href="~/common_imgs/icon/favicon.ico">
     <link rel="canonical" href="https://bot-market.com/blog/@(Model.CatAlias)/@(Model.BlogAlias)/@Model.Lang" />
+    @foreach (Language language in Model.Languages.Where(l => l.LangName != Model.Lang))
+    {
+        <link rel="alternate" hreflang="@language.LangName" href="https://bot-market.com/blog/@(Model.CatAlias)/@(Model.BlogAlias)/@language.LangName" />
+    }
     <link rel="amphtml" href="https://bot-market.com/amp/blog/@(Model.CatAlias)/@(Model.BlogAlias)/@Model.Lang" />
     <script type="application/ld+json">
         {
