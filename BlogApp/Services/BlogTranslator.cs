@@ -237,6 +237,7 @@ namespace BlogApp.Services
             List<Language> languages = await blogContext.Languages.AsNoTracking().ToListAsync();
 
             List<Blog> blogsFromDb = await blogContext.Blogs.
+                AsNoTracking().
                 Include(b => b.Language).
                 Where(b => b.Language.LangName == "ru").
                 ToListAsync();
@@ -304,6 +305,8 @@ namespace BlogApp.Services
 
                     try
                     {
+                        BlogContext tempContext = serviceProvider.GetRequiredService<BlogContext>();
+
                         Console.WriteLine($"{lan.LangName}_task started");
 
                         Blog translatedBlog = new Blog();
@@ -314,7 +317,7 @@ namespace BlogApp.Services
                         }
                         catch (Exception e)
                         {
-                            throw new Exception("Ошибка перевода", e);
+                            throw new Exception($"Ошибка перевода. Сообщение: {e.Message}");
                         }
 
                         translatedBlog.Alias = alias;
@@ -326,7 +329,7 @@ namespace BlogApp.Services
                         }
                         catch (Exception e)
                         {
-                            throw new Exception("Ошибка перевода", e);
+                            throw new Exception($"Ошибка перевода. Сообщение: {e.Message}");
                         }
 
                         translatedBlog.UserId = blog.UserId;
@@ -358,7 +361,7 @@ namespace BlogApp.Services
                             }
                             catch (Exception e)
                             {
-                                throw new Exception("Ошибка перевода", e);
+                                throw new Exception($"Ошибка перевода. Сообщение: {e.Message}");
                             }
 
                             translatedBlog.Sections.Add(translatedSection);
@@ -379,7 +382,7 @@ namespace BlogApp.Services
                                 }
                                 catch (Exception e)
                                 {
-                                    throw new Exception("Ошибка перевода", e);
+                                    throw new Exception($"Ошибка перевода. Сообщение: {e.Message}");
                                 }
 
                                 translatedSection.Subsections.Add(translatedSub);
@@ -403,7 +406,7 @@ namespace BlogApp.Services
                                     }
                                     catch (Exception e)
                                     {
-                                        throw new Exception("Ошибка перевода", e);
+                                        throw new Exception($"Ошибка перевода. Сообщение: {e.Message}");
                                     }
 
                                     translatedSub.Paragraphs.Add(translatedPar);
@@ -413,24 +416,22 @@ namespace BlogApp.Services
 
                         lock (locker)
                         {
-                            blogContext.Blogs.Add(translatedBlog);
+                            tempContext.Blogs.Add(translatedBlog);
+
+                            tempContext.SaveChanges();
                         }
                     }
                     catch (Exception e)
                     {
-                        cts.Cancel();
+                        throw new Exception($"Ошибка при переводе статьи на {lan.LangName}. Сообщение: {e.Message}");
                     }
                 });
 
             }
             catch (Exception e)
             {   
-                await blogContext.SaveChangesAsync();
-
-                throw new Exception("Перевод статьи аварийно завершен", e);
-            }
-
-            await blogContext.SaveChangesAsync();
+                throw new Exception($"Перевод статьи аварийно завершен : {e.Message}");
+            } 
         }
 
         public async Task UpdateBlogsTranslationAsync(Blog updatedBlog)
