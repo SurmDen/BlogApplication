@@ -139,9 +139,12 @@
                 <div class="blog-units-intro">
                     <div class="blog-intro">
 
-                        <div class="blog-text">
-                            @Html.Raw(Model.SelectedBlog.Description)
-                        </div>
+                        @if (!string.IsNullOrEmpty(Model.SelectedBlog.Description))
+                        {
+                            <div class="blog-text">
+                                @Html.Raw(Model.SelectedBlog.Description)
+                            </div>
+                        }
 
                         @if (!string.IsNullOrEmpty(Model.SelectedBlog.Image))
                         {
@@ -165,20 +168,26 @@
 
                                 int subCount = 1;
 
-                                <a href="#sec-@sec.Id" class="h-section">
-                                    <span>@secCount.</span> @Html.Raw(sec.Title)
-                                </a>
-
-                                foreach (var sub in sec.Subsections)
+                                if (!string.IsNullOrEmpty(sec.Title))
                                 {
-                                    <a href="#sub-@sub.Id" class="h-subsection">
-                                        <span>@secCount.@subCount</span> @Html.Raw(sub.Title)
+                                    <a href="#sec-@sec.Id" class="h-section">
+                                        <span>@secCount.</span> @Html.Raw(sec.Title)
                                     </a>
 
-                                    subCount++;
-                                }
+                                    foreach (var sub in sec.Subsections)
+                                    {
+                                        if (!string.IsNullOrEmpty(sub.Title))
+                                        {
+                                            <a href="#sub-@sub.Id" class="h-subsection">
+                                                <span>@secCount.@subCount</span> @Html.Raw(sub.Title)
+                                            </a>
 
-                                secCount++;
+                                            subCount++;
+                                        }
+                                    }
+
+                                    secCount++;
+                                }
                             }
 
                             @if (!string.IsNullOrEmpty(Model.SelectedBlog.VideoName) && !string.IsNullOrEmpty(Model.SelectedBlog.VideoPath))
@@ -199,26 +208,32 @@
 
                     @foreach (var sec in Model.SelectedBlog.Sections)
                     {
-                        if (counter == 1)
+                        if (!string.IsNullOrEmpty(sec.Title))
                         {
-                            <h1 id="sec-@sec.Id" class="section-title">
-                                @Html.Raw(sec.Title)
-                            </h1>
-                        }
-                        else
-                        {
-                            <h2 id="sec-@sec.Id" class="section-title">
-                                @Html.Raw(sec.Title)
-                            </h2>
-                        }
+                            if (counter == 1)
+                            {
+                                <h1 id="sec-@sec.Id" class="section-title">
+                                    @Html.Raw(sec.Title)
+                                </h1>
+                            }
+                            else
+                            {
+                                <h2 id="sec-@sec.Id" class="section-title">
+                                    @Html.Raw(sec.Title)
+                                </h2>
+                            }
 
-                        counter++;
+                            counter++;
+                        }
 
                         foreach (var sub in sec.Subsections)
                         {
-                            <h3 id="sub-@sub.Id" class="subsection-title">
-                                @Html.Raw(sub.Title)
-                            </h3>
+                            if (!string.IsNullOrEmpty(sub.Title))
+                            {
+                                <h3 id="sub-@sub.Id" class="subsection-title">
+                                    @Html.Raw(sub.Title)
+                                </h3>
+                            }
 
                             int pars = 1;
 
