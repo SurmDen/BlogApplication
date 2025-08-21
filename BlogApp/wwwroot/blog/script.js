@@ -128,8 +128,6 @@ async function setTelegramUserAsync(){
             localStorage.setItem('bot_user', botDbUser);
 
             await getJsonAsync(`/blog/api/botuser/v1/storage/set/${botDbUser.id}`);
-
-            document.querySelector('.user-name').textContent = botDbUser.userName;
         }
     } catch (error) {
         
