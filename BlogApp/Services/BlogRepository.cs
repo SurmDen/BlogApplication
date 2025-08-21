@@ -199,6 +199,15 @@ namespace BlogApp.Services
             await _blogContext.SaveChangesAsync();
         }
 
+        public async Task DeleteBlogForeverAsync(string alias)
+        {
+            IEnumerable<Blog> blogs = _blogContext.Blogs.Where(b => b.Alias == alias);
+
+            _blogContext.RemoveRange(blogs);
+
+            await _blogContext.SaveChangesAsync();
+        }
+
         public async Task UpdateTagsAsync(string tagsString, string alias)
         {
             List<Tag> tags = new List<Tag>();

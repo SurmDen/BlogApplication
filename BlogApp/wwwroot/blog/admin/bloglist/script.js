@@ -19,4 +19,20 @@ closeButton.addEventListener('click', () => {
     errorBox.style.display = 'none';
 });
 
+let deleteButtons = document.querySelectorAll('.remove-forever-btn');
+
+Array.from(deleteButtons).forEach(b => {
+    b.addEventListener('click', async (e) => {
+        const alias = b.getAttribute('value');
+
+        if (alias !== '') {
+            const answer = await fetch(`/blog/api/delete/forever/${alias}`);
+
+            if (answer.ok) {
+                e.target.closest('.blog-element').remove();
+            }
+        }
+    });
+});
+
 

@@ -251,6 +251,25 @@ namespace BlogApp.Controllers
             {
                 await blogRepository.DeleteBlogAsync(alias);
 
+                logger.LogInformation("blogs with alias: {@alias} archived", alias);
+
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                logger.LogError("Error occured while try to archive blogs, message: {@mess}, alias: {@alias}", e.Message, alias);
+
+                return BadRequest();
+            }
+        }
+
+        [HttpGet("delete/forever/{alias}")]
+        public async Task<IActionResult> DeleteForeverBlogAsync(string alias)
+        {
+            try
+            {
+                await blogRepository.DeleteBlogForeverAsync(alias);
+
                 logger.LogInformation("blogs with alias: {@alias} deleted", alias);
 
                 return Ok();

@@ -499,14 +499,14 @@ publishButton.addEventListener('click', generateBlogAndSendToServer);
 
 async function generateBlogAndSendToServer(){
 
-    let isValid = validateInputs();
+    // let isValid = validateInputs();
 
-    if(!isValid){
+    // if(!isValid){
 
-        showErrorMessage('Все поля в форме должны быть заполнены');
+    //     showErrorMessage('Все поля в форме должны быть заполнены');
 
-        return;
-    }
+    //     return;
+    // }
 
     let blogImage = document.querySelector('#add-blog-img').files[0];
 

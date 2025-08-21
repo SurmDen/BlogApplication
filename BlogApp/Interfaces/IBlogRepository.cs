@@ -16,6 +16,8 @@ namespace BlogApp.Interfaces
 
         public Task DeleteBlogAsync(string blogAlias);
 
+        public Task DeleteBlogForeverAsync(string alias);
+
         public Task<Blog> GetBlogByIdAsync(long id);
 
         public Task<Blog> GetBlogByAliasAndLanguageAsync(string alias, string langCode);
