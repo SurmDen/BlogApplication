@@ -56,7 +56,7 @@ namespace BlogApp.Controllers
         }
 
         [HttpPost("v1/create")]
-        public async Task<BotUserShortData> AddBotUserAsync(CreateBotUserRequest createBotUserRequest)
+        public async Task<BotUserShortData> AddBotUserAsync([FromBody]CreateBotUserRequest createBotUserRequest)
         {
             return await botUserRepository.AddBotUserAsync(createBotUserRequest);
         }
@@ -69,6 +69,19 @@ namespace BlogApp.Controllers
                 BotUserShortData botUser =  await botUserRepository.GetBotUserByIdAsync(id);
 
                 HttpContext.Session.SetString("current_bot_user", JsonConvert.SerializeObject(botUser));
+            }
+            catch (InvalidOperationException)
+            {
+
+            }
+        }
+
+        [HttpGet("v1/storage/remove")]
+        public void RemoveBotUserFromStorageAsync()
+        {
+            try
+            {
+                HttpContext.Session.Remove("current_bot_user");
             }
             catch (InvalidOperationException)
             {

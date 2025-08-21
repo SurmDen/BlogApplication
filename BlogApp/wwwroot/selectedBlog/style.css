@@ -123,6 +123,17 @@ p{
     transform: scale(1.1);
 }
 
+.user-block a {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgb(225, 145, 32);
+    letter-spacing: 0.3px;
+    position: relative;
+    font-weight: 700;
+    padding-right: 8px;
+}
+
 .list-bullet{
     list-style:disc;
 }

@@ -77,7 +77,8 @@
                         Sign In
                     </a>
                     <div class="user-block">
-                        <span class="user-name">@Model.CurrentUser.UserName</span>
+                        <span class="user-name">@Model.CurrentUser.FirstName</span>
+                        <a href="/blog/authpage/login">SIGN OUT</a>
                     </div>
                 </div>
                 <form asp-page="selectedblog" method="post">
@@ -303,7 +304,7 @@
                                             @if (comment.BotUserId != Model.CurrentUser.Id)
                                             {
                                                 <span class="comment-user">
-                                                    @comment.BotUser.UserName
+                                                    @comment.BotUser.FirstName
                                                 </span>
                                             }
                                             <div class="comment-text-data">
@@ -383,7 +384,7 @@
                                                         <div class=@(answer.BotUserId == Model.CurrentUser.Id ? "user-comment" : "comment")>
                                                             @if (answer.BotUserId != Model.CurrentUser.Id)
                                                             {
-                                                                <span class="comment-user">@answer.BotUser.UserName</span>
+                                                                <span class="comment-user">@answer.BotUser.FirstName</span>
                                                             }
                                                             <div>
                                                                 @if (answer.Language.LangName != Model.Lang)

@@ -56,6 +56,12 @@ async function getAsync(url){
     return response;
 };
 
+localStorage.removeItem('access_token');
+localStorage.removeItem('refresh_token');
+localStorage.removeItem('bot_user');
+
+getAsync("/blog/api/botuser/v1/storage/remove");
+
 async function registerByQRCodeAsync(){
 
     document.querySelector('.spinner-container').style.display = 'block';
