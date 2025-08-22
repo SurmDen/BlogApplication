@@ -12,7 +12,7 @@
     <meta name="robots" content="all" />
     <title>@Model.SelectedBlog.Title</title>
     <link rel="stylesheet" href="~/selectedBlog/style.css">
-    <link rel="stylesheet" href="~/comments/style.css"/>
+    <link rel="stylesheet" href="~/comments/new_styles.css"/>
     <link rel="icon" href="~/common_imgs/icon/favicon.ico">
     <link rel="canonical" href="https://bot-market.com/blog/@(Model.CatAlias)/@(Model.BlogAlias)/@Model.Lang" />
     @foreach (Language language in Model.Languages.Where(l => l.LangName != Model.Lang))
@@ -77,7 +77,7 @@
                         Sign In
                     </a>
                     <div class="user-block">
-                        <span class="user-name">@Model.CurrentUser.FirstName</span>
+                        <span class="user-name"></span>
                         <a href="/blog/authpage/login">SIGN OUT</a>
                     </div>
                 </div>
