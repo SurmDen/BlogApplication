@@ -105,11 +105,29 @@
                                 <div class="blog-img-container">
                                     @if (!string.IsNullOrEmpty(blog.Image))
                                     {
-                                        <amp-img width="auto" height=150px media="(min-width: 300px)" layout="fixed-height" position="absolute" left=0 top=0; src="@blog.Image" alt="@blog.Title"></amp-img>
+                                        <img class="blog-image"
+                                             src="/cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto@(blog.Image)"
+                                             srcset="
+                                        /cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto@(blog.Image) 300w,
+                                        /cdn-cgi/image/width=600,height=300,fit=crop,gravity=auto,format=auto@(blog.Image) 600w
+                                                                "
+                                             sizes="300px"
+                                             alt="@blog.Title"
+                                             loading="lazy"
+                                             style="width: 300px; height: 150px; object-fit: cover;">
                                     }
                                     else
                                     {
-                                        <amp-img width="auto" height=150px media="(min-width: 300px)" layout="fixed-height" position="absolute" left=0 top=0; src="/common_imgs/bot.png" alt="@blog.Title"></amp-img>
+                                        <img class="blog-image"
+                                             src="/cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto/common_imgs/bot.png"
+                                             srcset="
+                                        /cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto@(blog.Image) 300w,
+                                        /cdn-cgi/image/width=600,height=300,fit=crop,gravity=auto,format=auto@(blog.Image) 600w
+                                                                            "
+                                             sizes="300px"
+                                             alt="@blog.Title"
+                                             loading="lazy"
+                                             style="width: 300px; height: 150px; object-fit: cover;">
                                     }
                                 </div>
                                 <div class="blog-title">

@@ -149,7 +149,21 @@
 
                         @if (!string.IsNullOrEmpty(Model.SelectedBlog.Image))
                         {
-                            <img class="blog-image imagination" src="@Model.SelectedBlog.Image" alt="@Model.SelectedBlog.Title">
+                            <img class="blog-image imagination"
+                                 src="/cdn-cgi/image/width=1200,format=auto@(Model.SelectedBlog.Image)"
+                                 srcset="
+            /cdn-cgi/image/width=400,format=auto@(Model.SelectedBlog.Image) 400w,
+            /cdn-cgi/image/width=800,format=auto@(Model.SelectedBlog.Image) 800w,
+            /cdn-cgi/image/width=1200,format=auto@(Model.SelectedBlog.Image) 1200w,
+            /cdn-cgi/image/width=1600,format=auto@(Model.SelectedBlog.Image) 1600w
+         "
+                                 sizes="(max-width: 480px) 100vw,
+            (max-width: 768px) 90vw,
+            (max-width: 1200px) 80vw,
+            1200px"
+                                 alt="@Model.SelectedBlog.Title"
+                                 loading="lazy"
+                                 style="max-width: 100%; height: auto; display: block;">
                         }
                         else
                         {
@@ -245,7 +259,21 @@
                                     @if (!string.IsNullOrEmpty(par.Image))
                                     {
                                         <div class="blog-image-container">
-                                            <img class="p-blog-image imagination" src="@par.Image" alt="@sub.Title-@pars">
+                                            <img class="blog-image"
+                                                 src="/cdn-cgi/image/width=1200,format=auto@(@par.Image)"
+                                                 srcset="
+            /cdn-cgi/image/width=400,format=auto@(Model.SelectedBlog.Image) 400w,
+            /cdn-cgi/image/width=800,format=auto@(Model.SelectedBlog.Image) 800w,
+            /cdn-cgi/image/width=1200,format=auto@(Model.SelectedBlog.Image) 1200w,
+            /cdn-cgi/image/width=1600,format=auto@(Model.SelectedBlog.Image) 1600w
+                     "
+                                                 sizes="(max-width: 480px) 100vw,
+            (max-width: 768px) 90vw,
+            (max-width: 1200px) 80vw,
+            1200px"
+                                                 alt="@sub.Title-@pars"
+                                                 loading="lazy"
+                                                 style="max-width: 100%; height: auto; display: block;">
                                         </div>
 
                                         pars++;
@@ -475,11 +503,29 @@
                                                         <div class="same-blog-img-container">
                                                             @if (!string.IsNullOrEmpty(blog.Image))
                                                             {
-                                                                <img src="@blog.Image" alt="@blog.Title">
+                                                                <img class="blog-image"
+                                                                     src="/cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto@(blog.Image)"
+                                                                     srcset="
+                                        /cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto@(blog.Image) 300w,
+                                        /cdn-cgi/image/width=600,height=300,fit=crop,gravity=auto,format=auto@(blog.Image) 600w
+                                                                            "
+                                                                     sizes="300px"
+                                                                     alt="@blog.Title"
+                                                                     loading="lazy"
+                                                                     style="width: 300px; height: 150px; object-fit: cover;">
                                                             }
                                                             else
                                                             {
-                                                                <img src="~/common_imgs/bot.png" alt="">
+                                                                <img class="blog-image"
+                                                                     src="/cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto/common_imgs/bot.png"
+                                                                     srcset="
+                                        /cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto@(blog.Image) 300w,
+                                        /cdn-cgi/image/width=600,height=300,fit=crop,gravity=auto,format=auto@(blog.Image) 600w
+                                                                                        "
+                                                                     sizes="300px"
+                                                                     alt="@blog.Title"
+                                                                     loading="lazy"
+                                                                     style="width: 300px; height: 150px; object-fit: cover;">
                                                             }
                                                         </div>
                                                         <div class="same-blog-title">
@@ -500,11 +546,29 @@
                                                         <div class="same-blog-img-container">
                                                             @if (!string.IsNullOrEmpty(blog.Image))
                                                             {
-                                                                <img src="@blog.Image" alt="@blog.Title">
+                                                                <img class="blog-image"
+                                                                     src="/cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto@(blog.Image)"
+                                                                     srcset="
+                                        /cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto@(blog.Image) 300w,
+                                        /cdn-cgi/image/width=600,height=300,fit=crop,gravity=auto,format=auto@(blog.Image) 600w
+                                                                            "
+                                                                     sizes="300px"
+                                                                     alt="@blog.Title"
+                                                                     loading="lazy"
+                                                                     style="width: 300px; height: 150px; object-fit: cover;">
                                                             }
                                                             else
                                                             {
-                                                                <img src="~/common_imgs/bot.png" alt="">
+                                                                <img class="blog-image"
+                                                                     src="/cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto/common_imgs/bot.png"
+                                                                     srcset="
+                                        /cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto@(blog.Image) 300w,
+                                        /cdn-cgi/image/width=600,height=300,fit=crop,gravity=auto,format=auto@(blog.Image) 600w
+                                                                                        "
+                                                                     sizes="300px"
+                                                                     alt="@blog.Title"
+                                                                     loading="lazy"
+                                                                     style="width: 300px; height: 150px; object-fit: cover;">
                                                             }
                                                         </div>
                                                         <div class="same-blog-title">
@@ -536,11 +600,29 @@
                                                 <div class="same-blog-img-container">
                                                     @if (!string.IsNullOrEmpty(blog.Image))
                                                     {
-                                                        <img src="@blog.Image" alt="@blog.Title">
+                                                        <img class="blog-image"
+                                                             src="/cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto@(blog.Image)"
+                                                             srcset="
+                                        /cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto@(blog.Image) 300w,
+                                        /cdn-cgi/image/width=600,height=300,fit=crop,gravity=auto,format=auto@(blog.Image) 600w
+                                                                    "
+                                                             sizes="300px"
+                                                             alt="@blog.Title"
+                                                             loading="lazy"
+                                                             style="width: 300px; height: 150px; object-fit: cover;">
                                                     }
                                                     else
                                                     {
-                                                        <img src="~/common_imgs/bot.png" alt="">
+                                                        <img class="blog-image"
+                                                             src="/cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto/common_imgs/bot.png"
+                                                             srcset="
+                                        /cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto@(blog.Image) 300w,
+                                        /cdn-cgi/image/width=600,height=300,fit=crop,gravity=auto,format=auto@(blog.Image) 600w
+                                                                                "
+                                                             sizes="300px"
+                                                             alt="@blog.Title"
+                                                             loading="lazy"
+                                                             style="width: 300px; height: 150px; object-fit: cover;">
                                                     }
                                                 </div>
                                                 <div class="same-blog-title">
@@ -564,11 +646,29 @@
                                                 <div class="same-blog-img-container">
                                                     @if (!string.IsNullOrEmpty(blog.Image))
                                                     {
-                                                        <img src="@blog.Image" alt="@blog.Title">
+                                                        <img class="blog-image"
+                                                             src="/cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto@(blog.Image)"
+                                                             srcset="
+                                        /cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto@(blog.Image) 300w,
+                                        /cdn-cgi/image/width=600,height=300,fit=crop,gravity=auto,format=auto@(blog.Image) 600w
+                                                                    "
+                                                             sizes="300px"
+                                                             alt="@blog.Title"
+                                                             loading="lazy"
+                                                             style="width: 300px; height: 150px; object-fit: cover;">
                                                     }
                                                     else
                                                     {
-                                                        <img src="~/common_imgs/bot.png" alt="">
+                                                        <img class="blog-image"
+                                                             src="/cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto/common_imgs/bot.png"
+                                                             srcset="
+                                        /cdn-cgi/image/width=300,height=150,fit=crop,gravity=auto,format=auto@(blog.Image) 300w,
+                                        /cdn-cgi/image/width=600,height=300,fit=crop,gravity=auto,format=auto@(blog.Image) 600w
+                                                                                "
+                                                             sizes="300px"
+                                                             alt="@blog.Title"
+                                                             loading="lazy"
+                                                             style="width: 300px; height: 150px; object-fit: cover;">
                                                     }
                                                 </div>
                                                 <div class="same-blog-title">
