@@ -34,6 +34,7 @@
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
+    width:fit-content;
     transition: all 0.2s ease;
 }
 
@@ -88,7 +89,7 @@
 }
 
 .comment-area {
-    width: 100%;
+    width: 98%;
     min-height: 80px;
     padding: 12px;
     border: 1px solid var(--white_gray);
@@ -155,7 +156,7 @@
 }
 
 .comment-answer-input {
-    width: 100%;
+    width: 98%;
     padding: 8px 12px;
     border: 1px solid var(--white_gray);
     border-radius: var(--border_radius);
@@ -189,8 +190,6 @@
 
 .user-comment {
     background-color: white;
-    border: 1px solid var(--dark_blue);
-    border-left: 3px solid var(--dark_blue);
 }
 
 .comment-list-empty {
